@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-geist-sans: 'Geist Sans', system-ui, sans-serif;
+    --font-geist-mono: 'Geist Mono', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #0a0a0f;
+    color: #ffffff;
+    min-height: 100vh;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(124, 106, 245, 0.3);
+    color: white;
+  }
+}
+
+@layer components {
+  /* Card base */
+  .card {
+    @apply bg-surface border border-border rounded-xl p-5;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-border-2 hover:bg-surface-2 cursor-pointer;
+  }
+
+  /* Pill / badge */
+  .pill {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-2 text-white font-medium px-4 py-2 rounded-lg transition-all duration-150 text-sm;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-white/5 text-slate-400 hover:text-white font-medium px-4 py-2 rounded-lg transition-all duration-150 text-sm;
+  }
+
+  .btn-outline {
+    @apply border border-border-2 hover:border-white/20 hover:bg-white/5 text-slate-300 font-medium px-4 py-2 rounded-lg transition-all duration-150 text-sm;
+  }
+
+  /* Input */
+  .input {
+    @apply bg-surface border border-border rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/30 transition-all;
+  }
+
+  /* Section label */
+  .section-label {
+    @apply text-xs font-semibold text-slate-500 uppercase tracking-widest;
+  }
+
+  /* Shimmer loading skeleton */
+  .skeleton {
+    @apply bg-white/5 rounded-lg animate-pulse;
+  }
+
+  /* Viral score ring */
+  .score-ring {
+    @apply inline-flex items-center justify-center rounded-full font-bold text-xs border;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@layer utilities {
+  /* Stagger animation delays for lists */
+  .stagger-1 { animation-delay: 0ms; }
+  .stagger-2 { animation-delay: 60ms; }
+  .stagger-3 { animation-delay: 120ms; }
+  .stagger-4 { animation-delay: 180ms; }
+  .stagger-5 { animation-delay: 240ms; }
+  .stagger-6 { animation-delay: 300ms; }
+
+  /* Glass morphism */
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Subtle text gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, #fff 0%, #a89ef8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
