@@ -1,6 +1,6 @@
 // lib/api.ts — typed client for the FastAPI backend
 
-const BACKEND = "https://web-production-e0674.up.railway.app"
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000").replace(/\/$/, '')
 
 async function call<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BACKEND}${path}`, {
