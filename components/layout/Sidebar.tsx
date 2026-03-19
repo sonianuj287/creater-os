@@ -20,8 +20,8 @@ const NAV_ITEMS = [
   { label: 'Feed', href: '/dashboard', icon: Sparkles },
   { label: 'Ideas', href: '/dashboard/studio', icon: Lightbulb },
   { label: 'Editor', href: '/dashboard/editor', icon: Film },
-  { label: 'Publish', href: '/dashboard/publish', icon: SendHorizonal, comingSoon: true },
-  { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3, comingSoon: true },
+  { label: 'Publish', href: '/dashboard/publish', icon: SendHorizonal },
+  { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
 ]
 
 export function Sidebar() {
