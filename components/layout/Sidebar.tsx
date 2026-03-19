@@ -17,11 +17,11 @@ import { cn } from '@/lib/utils'
 import { signOut } from '@/lib/supabase'
 
 const NAV_ITEMS = [
-  { label: 'Feed', href: '/dashboard', icon: Sparkles },
-  { label: 'Ideas', href: '/dashboard/studio', icon: Lightbulb },
-  { label: 'Editor', href: '/dashboard/editor', icon: Film },
-  { label: 'Publish', href: '/dashboard/publish', icon: SendHorizonal },
-  { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { label: 'Feed', href: '/dashboard', icon: Sparkles, comingSoon: false },
+  { label: 'Ideas', href: '/dashboard/studio', icon: Lightbulb, comingSoon: false },
+  { label: 'Editor', href: '/dashboard/editor', icon: Film, comingSoon: false },
+  { label: 'Publish', href: '/dashboard/publish', icon: SendHorizonal, comingSoon: false },
+  { label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3, comingSoon: false },
 ]
 
 export function Sidebar() {
