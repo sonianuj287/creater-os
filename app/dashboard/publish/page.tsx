@@ -8,7 +8,10 @@ import {
   Loader2, AlertCircle, Calendar,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-import { CaptionGenerator, Scheduler, PlatformConnections } from '@/components/publish'
+import { CaptionGenerator } from '@/components/publish/CaptionGenerator'
+import { Scheduler } from '@/components/publish/Scheduler'
+import { PlatformConnections } from '@/components/publish/PlatformConnections'
+import { PostToInstagram } from '@/components/publish/PostToInstagram'
 import { cn, formatNumber } from '@/lib/utils'
 
 const FORMAT_LABELS: Record<string, { label: string; desc: string }> = {
@@ -348,21 +351,35 @@ export default function PublishPage() {
 
                 {/* Schedule tab */}
                 {tab === 'schedule' && (
-                  <div className="space-y-4">
-                    <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
-                      <p className="text-xs font-semibold text-amber-400 mb-1">Connect your accounts first</p>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        Auto-posting requires connecting your Instagram and YouTube accounts.
-                        Switch to the Accounts tab to connect them.
+                  <div className="space-y-5">
+                    {/* Post now section */}
+                    <div className="bg-surface border border-border rounded-2xl p-5">
+                      <p className="text-sm font-semibold text-white mb-1">Post now</p>
+                      <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                        Post directly to Instagram using your connected account.
                       </p>
+                      <PostToInstagram
+                        projectId={selected.id}
+                        outputId={output.id}
+                        videoUrl={output.format_urls?.['9x16'] ?? ''}
+                        caption={selected.title}
+                        hashtags=""
+                      />
                     </div>
-                    <Scheduler
-                      projectId={selected.id}
-                      outputId={output.id}
-                      platform="instagram"
-                      caption={selected.title}
-                      hashtags=""
-                    />
+                    {/* Schedule for later */}
+                    <div className="bg-surface border border-border rounded-2xl p-5">
+                      <p className="text-sm font-semibold text-white mb-1">Schedule for later</p>
+                      <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                        Pick a time and we'll remind you to post — or auto-post when accounts are connected.
+                      </p>
+                      <Scheduler
+                        projectId={selected.id}
+                        outputId={output.id}
+                        platform="instagram"
+                        caption={selected.title}
+                        hashtags=""
+                      />
+                    </div>
                   </div>
                 )}
 
