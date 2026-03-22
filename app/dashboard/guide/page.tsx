@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -124,7 +124,7 @@ function ScriptSectionCard({ section, index }: { section: ScriptSection; index: 
   )
 }
 
-export default function GuidePage() {
+function GuidePage() {
   const searchParams = useSearchParams()
   const [title, setTitle]           = useState('')
   const [description, setDescription] = useState('')
@@ -484,5 +484,13 @@ export default function GuidePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function GuidePageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <GuidePage />
+    </Suspense>
   )
 }
