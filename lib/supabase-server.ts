@@ -67,7 +67,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 2. Logged-in users on login page → send to dashboard
-  //    (but NOT onboarding — they need to be able to visit that)
+  //    The OAuth callback handles post-login routing.
+  //    We still redirect here as a fallback for direct /auth/login visits.
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'

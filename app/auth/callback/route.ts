@@ -3,15 +3,15 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
+  const code  = searchParams.get('code')
 
   if (code) {
     const supabase = createServerComponentClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+
     if (!error) {
-      // Check if onboarding is complete
       const { data: { user } } = await supabase.auth.getUser()
+
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -19,11 +19,14 @@ export async function GET(request: NextRequest) {
           .eq('id', user.id)
           .single()
 
+        // New user — go to onboarding
         if (!profile?.onboarding_completed) {
           return NextResponse.redirect(`${origin}/auth/onboarding`)
         }
       }
-      return NextResponse.redirect(`${origin}${next}`)
+
+      // Existing user — go straight to dashboard
+      return NextResponse.redirect(`${origin}/dashboard`)
     }
   }
 
