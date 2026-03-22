@@ -1,8 +1,7 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import { useEffect, useRef, useState } from 'react'
+import { createClient } from '@/lib/supabase'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 
@@ -223,6 +222,17 @@ function StepCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
 }
 
 export default function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    createClient().auth.getSession().then(({ data }) => {
+      if (data.session) setIsLoggedIn(true)
+    })
+  }, [])
+
+  const ctaHref  = isLoggedIn ? '/dashboard' : '/auth/login'
+  const ctaLabel = isLoggedIn ? 'Go to dashboard →' : 'Get started free'
+
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY     = useTransform(scrollYProgress, [0, 1], [0, 120])
@@ -255,11 +265,11 @@ export default function LandingPage() {
 
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-3">
           <Link href="/auth/login" className="text-sm text-slate-400 hover:text-white transition-colors hidden md:block">Sign in</Link>
-          <Link href="/auth/login"
+          <Link href={ctaHref}
             className="text-sm font-semibold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, #7c6af5, #a89ef8)' }}
           >
-            Get started free
+            {isLoggedIn ? 'Dashboard' : 'Get started'}
           </Link>
         </motion.div>
       </nav>
@@ -310,11 +320,11 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link href="/auth/login"
+            <Link href={ctaHref}
               className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-white text-base transition-all hover:scale-105 hover:shadow-2xl"
               style={{ background: 'linear-gradient(135deg, #7c6af5, #ec4899)', boxShadow: '0 0 40px rgba(124,106,245,0.3)' }}
             >
-              Start creating free
+              {ctaLabel}
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
             <a href="#how-it-works" className="flex items-center gap-2 px-6 py-4 rounded-2xl font-medium text-slate-300 hover:text-white text-base transition-all border border-white/10 hover:border-white/20 hover:bg-white/5">
@@ -473,7 +483,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/auth/login"
+                <Link href={ctaHref}
                   className={`block text-center py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 ${plan.highlight ? 'text-white' : 'text-slate-300 border border-white/15 hover:border-white/30'}`}
                   style={plan.highlight ? { background: 'linear-gradient(135deg, #7c6af5, #ec4899)' } : {}}
                 >
@@ -501,11 +511,11 @@ export default function LandingPage() {
           <p className="text-lg text-slate-400 mb-10">
             Join creators who are posting more, stressing less, and growing faster with Creator OS.
           </p>
-          <Link href="/auth/login"
+          <Link href={ctaHref}
             className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-bold text-white text-lg transition-all hover:scale-105"
             style={{ background: 'linear-gradient(135deg, #7c6af5, #ec4899)', boxShadow: '0 0 60px rgba(124,106,245,0.4)' }}
           >
-            Start for free
+            {ctaLabel}
             <span className="text-xl">→</span>
           </Link>
           <p className="text-xs text-slate-600 mt-4">No credit card required. Free forever plan available.</p>
