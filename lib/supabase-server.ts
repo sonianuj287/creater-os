@@ -52,8 +52,7 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect unauthenticated users to login
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard') || 
-                      request.nextUrl.pathname === '/'
+  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
 
   if (!user && isDashboard) {
     const url = request.nextUrl.clone()
