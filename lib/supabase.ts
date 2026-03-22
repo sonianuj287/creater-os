@@ -38,4 +38,5 @@ export async function updateProfile(userId: string, updates: Partial<Profile>) {
 export async function signOut() {
   const supabase = createClient()
   await supabase.auth.signOut()
+  window.location.href = '/'
 }

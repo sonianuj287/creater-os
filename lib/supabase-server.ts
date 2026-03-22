@@ -13,7 +13,7 @@ export function createServerComponentClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, any> }[]) {
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           cookiesToSet.forEach(({ name, value, options }) => {
             cookieStore.set(name, value, options)
           })
@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, any> }[]) {
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
@@ -50,22 +50,30 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Redirect unauthenticated users to login
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
+  const pathname = request.nextUrl.pathname
 
+  // Routes that require authentication
+  const isDashboard = pathname.startsWith('/dashboard')
+
+  // Auth routes — only login should redirect logged-in users away
+  // onboarding must be accessible to logged-in users
+  const isLoginPage = pathname === '/auth/login'
+
+  // 1. Unauthenticated users trying to access dashboard → send to login
   if (!user && isDashboard) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
 
-  // Redirect logged-in users away from auth pages
-  if (user && isAuthRoute) {
+  // 2. Logged-in users on login page → send to dashboard
+  //    (but NOT onboarding — they need to be able to visit that)
+  if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 
+  // 3. Everyone else (including landing page '/', onboarding, callback) → pass through
   return supabaseResponse
 }

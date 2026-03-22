@@ -266,7 +266,6 @@ export default function LandingPage() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-3">
-          <Link href="/auth/login" className="text-sm text-slate-400 hover:text-white transition-colors hidden md:block">Sign in</Link>
           <Link href={ctaHref}
             className="text-sm font-semibold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, #7c6af5, #a89ef8)' }}
@@ -533,7 +532,6 @@ export default function LandingPage() {
           </div>
           <p className="text-xs text-slate-600">Built for creators in India. Post more. Stress less.</p>
           <div className="flex gap-6">
-            <Link href="/auth/login" className="text-xs text-slate-500 hover:text-white transition-colors">Sign in</Link>
             <Link href="/dashboard" className="text-xs text-slate-500 hover:text-white transition-colors">Dashboard</Link>
           </div>
         </div>
