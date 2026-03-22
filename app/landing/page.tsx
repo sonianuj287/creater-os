@@ -3,226 +3,350 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
+
+// ── Data ──────────────────────────────────────────────────────
 
 const STEPS = [
-  { num: '01', title: 'Discover', sub: 'Trending ideas', desc: 'AI scans YouTube and Instagram daily. You wake up to 20 viral-ready ideas in your niche — with hooks, angles, and difficulty ratings already attached.', color: '#7c6af5' },
-  { num: '02', title: 'Plan', sub: 'Script + shot list', desc: 'Pick an idea. Get a full script outline, a shot-by-shot filming guide, and free B-roll links. You know exactly what to say and what to film before you hit record.', color: '#ec4899' },
-  { num: '03', title: 'Film', sub: 'Scene by scene', desc: 'Upload each scene as you film it. The app assembles them in order, cuts silences, burns captions, and exports in 3 formats automatically.', color: '#06b6d4' },
-  { num: '04', title: 'Multiply', sub: '10x your output', desc: 'One video becomes a Reel, a Short, a carousel, a tweet thread, and a newsletter — in minutes. Not hours.', color: '#10b981' },
-  { num: '05', title: 'Publish', sub: 'Post everywhere', desc: 'Generate platform-specific captions and hashtags, schedule your posts at peak times, and push to Instagram and YouTube in one click.', color: '#f59e0b' },
-]
-
-const STATS = [
-  { value: '10×', label: 'More content from one video' },
-  { value: '3 min', label: 'To process a full video' },
-  { value: '5+', label: 'Platforms in one click' },
-  { value: '0', label: 'Design skills needed' },
+  { num: '01', title: 'Discover', sub: 'Trending ideas daily', desc: 'AI scans YouTube and Instagram every morning. You wake up to 20 viral-ready ideas in your niche — with hooks, angles, and difficulty ratings.', color: '#7c6af5', bg: 'rgba(124,106,245,0.08)' },
+  { num: '02', title: 'Plan',     sub: 'Script + shot list',   desc: 'One click generates a full script, shot list, and free B-roll links. You know exactly what to say before you hit record.', color: '#ec4899', bg: 'rgba(236,72,153,0.08)' },
+  { num: '03', title: 'Film',     sub: 'Scene by scene',       desc: 'Upload each scene separately. The AI assembles them, cuts silences, burns captions, and exports in 3 formats — automatically.', color: '#06b6d4', bg: 'rgba(6,182,212,0.08)' },
+  { num: '04', title: 'Publish',  sub: 'Post everywhere',      desc: 'AI captions, perfect hashtags, scheduled at peak times. One click posts to Instagram and YouTube simultaneously.', color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
 ]
 
 const FEATURES = [
-  { icon: '⚡', title: 'AI Idea Engine', desc: 'Daily trending ideas personalised to your niche with viral scores, hooks, and difficulty ratings.' },
-  { icon: '📝', title: 'Script Studio', desc: 'Full script outline, shot list, and B-roll links. Film with confidence, not guesswork.' },
-  { icon: '✂️', title: 'Smart Editor', desc: 'Auto silence cut, caption burn-in, and 3-format export from a single upload.' },
-  { icon: '🎬', title: 'Scene Assembler', desc: 'Upload each scene separately. The AI assembles, edits, and combines them into one polished video.' },
-  { icon: '🚀', title: 'One-Click Publish', desc: 'AI captions + hashtags + scheduled posting to Instagram and YouTube simultaneously.' },
-  { icon: '📊', title: 'Growth Analytics', desc: 'Track what works, see your path to monetisation, and let the algorithm learn your style.' },
+  { icon: '⚡', title: 'Trending idea engine',    desc: 'Daily ideas personalised to your niche with viral scores and ready-to-use hooks.',        color: '#7c6af5' },
+  { icon: '📝', title: 'AI script studio',        desc: 'Full script outline, shot list, and B-roll links in one click.',                          color: '#ec4899' },
+  { icon: '✂️', title: 'Smart video editor',      desc: 'Auto silence cut, caption burn-in, 3-format export from a single upload.',               color: '#06b6d4' },
+  { icon: '🎬', title: 'Scene assembler',          desc: 'Film in parts. AI stitches, captions, and polishes into one complete video.',             color: '#f59e0b' },
+  { icon: '🚀', title: 'One-click publishing',    desc: 'AI captions + hashtags + scheduled posts to Instagram and YouTube.',                       color: '#10b981' },
+  { icon: '📊', title: 'Growth analytics',        desc: 'Track views, saves, follower growth and see your path to monetisation.',                  color: '#a855f7' },
 ]
 
-// Animated 3D-ish floating orbs background
-function OrbField() {
+const PAIN_POINTS = [
+  { pain: '"What should I make today?"',       fix: 'AI shows you 20 trending ideas in your niche every morning.' },
+  { pain: '"I don\'t know how to edit."',      fix: 'Upload clips. AI edits, captions, and exports in 3 formats automatically.' },
+  { pain: '"Captions take me an hour."',       fix: 'Platform-specific captions + hashtags generated in 10 seconds.' },
+  { pain: '"I forget to post consistently."', fix: 'Schedule weeks of content. Auto-post at peak engagement times.' },
+  { pain: '"One video = one post."',           fix: 'One video → Reel + Short + carousel + thread + newsletter.' },
+]
+
+// ── Logo Component ────────────────────────────────────────────
+function CreatorOSLogo({ size = 'lg' }: { size?: 'sm' | 'lg' }) {
+  const fontSize = size === 'lg' ? '5.5rem' : '1.1rem'
+  const iconSize = size === 'lg' ? 56 : 24
+  const iconRadius = size === 'lg' ? 16 : 8
+
+  if (size === 'sm') {
+    return (
+      <div className="flex items-center gap-2.5">
+        <div style={{
+          width: iconSize, height: iconSize, borderRadius: iconRadius,
+          background: 'linear-gradient(135deg, #7c6af5 0%, #ec4899 50%, #06b6d4 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 14, fontWeight: 900, color: '#fff',
+          boxShadow: '0 4px 20px rgba(124,106,245,0.4)',
+        }}>⚡</div>
+        <span style={{
+          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.03em',
+          background: 'linear-gradient(135deg, #fff 0%, #a89ef8 100%)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+        }}>Creator OS</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="text-center">
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 20 }}
+      >
+        {/* 3D icon */}
+        <motion.div
+          animate={{ rotateY: [0, 10, -10, 0], rotateX: [0, -5, 5, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            width: iconSize, height: iconSize, borderRadius: iconRadius,
+            background: 'linear-gradient(135deg, #7c6af5 0%, #ec4899 50%, #06b6d4 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, fontWeight: 900,
+            boxShadow: '0 8px 40px rgba(124,106,245,0.5), 0 2px 8px rgba(0,0,0,0.3)',
+            transformStyle: 'preserve-3d',
+          }}
+        >⚡</motion.div>
+
+        {/* Wordmark */}
+        <span style={{
+          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontWeight: 900,
+          fontSize: fontSize,
+          letterSpacing: '-0.04em',
+          lineHeight: 1,
+          background: 'linear-gradient(135deg, #ff4d4d 0%, #f97316 20%, #7c6af5 55%, #06b6d4 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}>
+          Creator OS
+        </span>
+      </motion.div>
+    </div>
+  )
+}
+
+// ── Animated grid background ──────────────────────────────────
+function GridBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Grid lines */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `
+          linear-gradient(rgba(124,106,245,0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(124,106,245,0.06) 1px, transparent 1px)
+        `,
+        backgroundSize: '60px 60px',
+      }} />
+      {/* Radial fade overlay */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 80% 60% at 50% 0%, transparent 40%, #08080f 100%)',
+      }} />
+      {/* Glowing orbs */}
       {[
-        { x: '15%', y: '20%', size: 400, color: '#7c6af5', delay: 0 },
-        { x: '75%', y: '10%', size: 300, color: '#ec4899', delay: 1.5 },
-        { x: '85%', y: '60%', size: 350, color: '#06b6d4', delay: 0.8 },
-        { x: '5%',  y: '70%', size: 280, color: '#7c6af5', delay: 2 },
-        { x: '45%', y: '85%', size: 320, color: '#10b981', delay: 1.2 },
+        { x: '20%', y: '30%', c: '#7c6af5', s: 500 },
+        { x: '80%', y: '15%', c: '#ec4899', s: 400 },
+        { x: '60%', y: '70%', c: '#06b6d4', s: 350 },
       ].map((orb, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full"
+        <motion.div key={i}
           style={{
-            left: orb.x, top: orb.y,
-            width: orb.size, height: orb.size,
-            background: `radial-gradient(circle at 35% 35%, ${orb.color}40, ${orb.color}08 70%, transparent)`,
+            position: 'absolute', left: orb.x, top: orb.y,
+            width: orb.s, height: orb.s,
+            background: `radial-gradient(circle, ${orb.c}25 0%, transparent 70%)`,
             filter: 'blur(40px)',
-            transform: 'translate(-50%, -50%)',
+            transform: 'translate(-50%,-50%)',
           }}
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.6, 1, 0.6],
-            x: [-20, 20, -20],
-            y: [-15, 15, -15],
-          }}
-          transition={{ duration: 8 + i * 1.5, repeat: Infinity, delay: orb.delay, ease: 'easeInOut' }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 6 + i * 2, repeat: Infinity, delay: i * 1.5, ease: 'easeInOut' }}
         />
       ))}
     </div>
   )
 }
 
-// Floating 3D card mockup
-function DashboardMockup() {
+// ── 3D floating dashboard mockup ──────────────────────────────
+function DashboardCard() {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  function handleMouseMove(e: React.MouseEvent) {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 20
+    const y = -((e.clientY - rect.top) / rect.height - 0.5) * 20
+    setMousePos({ x, y })
+  }
+  function handleMouseLeave() { setMousePos({ x: 0, y: 0 }) }
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, rotateX: 15 }}
+      initial={{ opacity: 0, y: 60, rotateX: 20 }}
       animate={{ opacity: 1, y: 0, rotateX: 8 }}
-      transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
-      className="relative mx-auto max-w-3xl"
+      transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ perspective: 1200, transformStyle: 'preserve-3d' }}
+      className="relative mx-auto max-w-3xl cursor-pointer"
     >
       <motion.div
-        animate={{ y: [-6, 6, -6], rotateZ: [-0.5, 0.5, -0.5] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative"
+        animate={{
+          rotateX: mousePos.y + 8,
+          rotateY: mousePos.x,
+          y: mousePos.x === 0 ? [-8, 8, -8] : 0,
+        }}
+        transition={mousePos.x === 0
+          ? { y: { duration: 5, repeat: Infinity, ease: 'easeInOut' } }
+          : { type: 'spring', stiffness: 200, damping: 30 }
+        }
         style={{ transformStyle: 'preserve-3d' }}
+        className="relative"
       >
-        {/* Glow behind card */}
-        <div className="absolute inset-0 -inset-x-8 bg-gradient-to-b from-violet-500/20 to-transparent rounded-3xl blur-3xl" />
+        {/* Glow */}
+        <div style={{
+          position: 'absolute', inset: '-20px',
+          background: 'radial-gradient(ellipse at 50% 50%, rgba(124,106,245,0.25), transparent 70%)',
+          filter: 'blur(30px)',
+          transform: 'translateZ(-10px)',
+        }} />
 
-        {/* Main card */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
-          style={{ background: 'linear-gradient(135deg, #111118 0%, #18181f 100%)' }}
-        >
-          {/* Browser chrome */}
-          <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/8" style={{ background: '#0e0e14' }}>
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-            <div className="ml-3 flex-1 bg-white/5 rounded-md py-1 px-3 text-[10px] text-slate-500 max-w-xs">
+        {/* Card */}
+        <div style={{
+          background: 'linear-gradient(145deg, #13131c 0%, #0e0e18 100%)',
+          borderRadius: 20,
+          border: '1px solid rgba(255,255,255,0.1)',
+          overflow: 'hidden',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.08)',
+        }}>
+          {/* Browser bar */}
+          <div style={{ background: '#0a0a12', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', opacity: 0.8 }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#eab308', opacity: 0.8 }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#22c55e', opacity: 0.8 }} />
+            <div style={{ marginLeft: 12, flex: 1, background: 'rgba(255,255,255,0.05)', borderRadius: 6, padding: '4px 12px', fontSize: 10, color: 'rgba(255,255,255,0.3)', maxWidth: 240 }}>
               creatorapp.in/dashboard
             </div>
           </div>
 
-          {/* Dashboard content */}
-          <div className="flex" style={{ minHeight: 340 }}>
+          <div style={{ display: 'flex', minHeight: 360 }}>
             {/* Sidebar */}
-            <div className="w-36 border-r border-white/5 p-3 space-y-1" style={{ background: '#0d0d14' }}>
-              <div className="flex items-center gap-2 px-2 py-2 mb-3">
-                <div className="w-5 h-5 rounded-md bg-violet-500/30 border border-violet-500/40 flex items-center justify-center">
-                  <span style={{ fontSize: 9 }}>⚡</span>
-                </div>
-                <span className="text-[10px] font-bold text-white">Creator OS</span>
+            <div style={{ width: 150, background: '#0a0a12', borderRight: '1px solid rgba(255,255,255,0.05)', padding: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 8px 16px' }}>
+                <div style={{ width: 22, height: 22, borderRadius: 6, background: 'linear-gradient(135deg,#7c6af5,#ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚡</div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>Creator OS</span>
               </div>
-              {['Feed', 'Ideas', 'Guide', 'Editor', 'Publish', 'Analytics'].map((item, i) => (
-                <div key={item} className={`flex items-center gap-2 px-2 py-1.5 rounded-md ${i === 0 ? 'bg-violet-500/20' : ''}`}>
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: i === 0 ? '#7c6af5' : '#333' }} />
-                  <span className={`text-[9px] font-medium ${i === 0 ? 'text-violet-300' : 'text-slate-500'}`}>{item}</span>
+              {[
+                { label: 'Feed', active: true, dot: '#7c6af5' },
+                { label: 'Ideas', active: false, dot: '#444' },
+                { label: 'Guide', active: false, dot: '#444' },
+                { label: 'Editor', active: false, dot: '#444' },
+                { label: 'Publish', active: false, dot: '#444' },
+                { label: 'Analytics', active: false, dot: '#444' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '7px 8px', borderRadius: 8, marginBottom: 2,
+                  background: item.active ? 'rgba(124,106,245,0.15)' : 'transparent',
+                }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: item.dot }} />
+                  <span style={{ fontSize: 10, color: item.active ? '#a89ef8' : 'rgba(255,255,255,0.3)', fontWeight: item.active ? 600 : 400 }}>{item.label}</span>
                 </div>
               ))}
             </div>
 
             {/* Main content */}
-            <div className="flex-1 p-4">
-              <div className="flex items-center justify-between mb-4">
+            <div style={{ flex: 1, padding: 16, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                 <div>
-                  <div className="text-[10px] text-orange-400 font-medium mb-0.5">🔥 TRENDING TODAY</div>
-                  <div className="text-sm font-bold text-white">What to create right now</div>
+                  <div style={{ fontSize: 9, color: '#f97316', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>🔥 Trending Today</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>What to create right now</div>
                 </div>
-                <div className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full border border-emerald-500/30">Live</div>
+                <div style={{ fontSize: 8, background: 'rgba(34,197,94,0.15)', color: '#4ade80', padding: '3px 8px', borderRadius: 20, border: '1px solid rgba(34,197,94,0.3)', fontWeight: 600 }}>● Live</div>
               </div>
 
-              {/* Idea cards */}
-              <div className="grid grid-cols-2 gap-2.5">
+              {/* Idea cards grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
                 {[
-                  { title: 'How I saved ₹50K on ₹30K salary', score: 91, tag: 'finance', color: '#7c6af5' },
-                  { title: '5 AI tools replacing freelancers', score: 87, tag: 'tech', color: '#ec4899' },
-                  { title: 'Morning routine that actually works', score: 84, tag: 'lifestyle', color: '#06b6d4' },
-                  { title: 'Gym for people who hate the gym', score: 88, tag: 'fitness', color: '#10b981' },
+                  { title: 'How I saved ₹50K on ₹30K salary', score: 91, tag: 'finance', c: '#7c6af5' },
+                  { title: '5 AI tools replacing freelancers', score: 87, tag: 'tech', c: '#ec4899' },
+                  { title: 'Morning routine that works', score: 84, tag: 'lifestyle', c: '#06b6d4' },
+                  { title: 'Gym for people who hate gym', score: 88, tag: 'fitness', c: '#10b981' },
                 ].map((card, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 + i * 0.1 }}
-                    className="rounded-xl border border-white/6 p-2.5 hover:border-white/12 transition-all cursor-pointer"
-                    style={{ background: 'rgba(255,255,255,0.03)' }}
+                  <motion.div key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 + i * 0.1 }}
+                    style={{
+                      background: 'rgba(255,255,255,0.03)', borderRadius: 10,
+                      border: '1px solid rgba(255,255,255,0.07)', padding: 10,
+                    }}
                   >
-                    <div className="flex justify-between items-start mb-1.5">
-                      <span className="text-[8px] font-medium px-1.5 py-0.5 rounded-full border" style={{ color: card.color, borderColor: card.color + '40', background: card.color + '15' }}>{card.tag}</span>
-                      <span className="text-[9px] font-bold text-emerald-400">{card.score}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 7, fontWeight: 700, padding: '2px 6px', borderRadius: 10, background: card.c + '20', color: card.c, border: `1px solid ${card.c}40` }}>{card.tag}</span>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: '#4ade80' }}>{card.score}</span>
                     </div>
-                    <p className="text-[9px] text-white leading-tight font-medium">{card.title}</p>
+                    <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.85)', fontWeight: 600, lineHeight: 1.4 }}>{card.title}</p>
                   </motion.div>
                 ))}
               </div>
 
               {/* Progress bar */}
               <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }}
-                className="mt-3 rounded-xl border border-violet-500/20 p-2.5"
-                style={{ background: 'rgba(124,106,245,0.06)' }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }}
+                style={{ background: 'rgba(124,106,245,0.08)', borderRadius: 10, border: '1px solid rgba(124,106,245,0.2)', padding: 10 }}
               >
-                <div className="flex justify-between mb-1.5">
-                  <span className="text-[8px] text-slate-400">Instagram monetisation goal</span>
-                  <span className="text-[8px] font-bold text-violet-400">64%</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)' }}>Instagram monetisation goal</span>
+                  <span style={{ fontSize: 8, color: '#a89ef8', fontWeight: 700 }}>64%</span>
                 </div>
-                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
                   <motion.div
-                    initial={{ width: 0 }} animate={{ width: '64%' }} transition={{ delay: 1.5, duration: 1 }}
-                    className="h-full rounded-full"
-                    style={{ background: 'linear-gradient(90deg, #7c6af5, #a89ef8)' }}
+                    initial={{ width: 0 }} animate={{ width: '64%' }}
+                    transition={{ delay: 1.8, duration: 1.2, ease: [0.22,1,0.36,1] }}
+                    style={{ height: '100%', background: 'linear-gradient(90deg,#7c6af5,#ec4899)', borderRadius: 2 }}
                   />
                 </div>
-                <p className="text-[7px] text-slate-600 mt-1">3,600 more followers to unlock IG Bonuses · ~6 weeks at current pace</p>
+                <p style={{ fontSize: 7, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>3,600 more followers · ~6 weeks at current pace</p>
               </motion.div>
             </div>
           </div>
         </div>
 
-        {/* Floating badges */}
+        {/* Floating notification badges */}
         {[
-          { text: '🎬 Video processed in 2m 43s', x: '-12%', y: '20%', delay: 1.8 },
-          { text: '✅ Posted to Instagram', x: '85%', y: '35%', delay: 2.1 },
-          { text: '🚀 91 viral score', x: '80%', y: '75%', delay: 2.4 },
-        ].map((badge, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: badge.delay, type: 'spring' }}
-            className="absolute text-[10px] font-semibold text-white px-3 py-1.5 rounded-full border border-white/10 whitespace-nowrap"
-            style={{ left: badge.x, top: badge.y, background: 'rgba(15,15,22,0.9)', backdropFilter: 'blur(12px)', boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }}
-          >
-            {badge.text}
-          </motion.div>
+          { text: '🎬 Video processed in 2m 43s', x: '-8%', y: '18%' },
+          { text: '✅ Posted to Instagram + YouTube', x: '78%', y: '32%' },
+          { text: '🚀 91 viral score · trending now', x: '72%', y: '78%' },
+        ].map((b, i) => (
+          <motion.div key={i}
+            initial={{ opacity: 0, scale: 0.7, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 1.8 + i * 0.25, type: 'spring', stiffness: 200 }}
+            style={{
+              position: 'absolute', left: b.x, top: b.y,
+              background: 'rgba(10,10,18,0.92)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 30, padding: '7px 14px',
+              fontSize: 11, fontWeight: 600, color: '#fff',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+              transform: 'translateZ(20px)',
+            }}
+          >{b.text}</motion.div>
         ))}
       </motion.div>
     </motion.div>
   )
 }
 
-// Step card with number
+// ── Step card ─────────────────────────────────────────────────
 function StepCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.8', 'start 0.2'] })
-  const opacity   = useTransform(scrollYProgress, [0, 0.5], [0.3, 1])
-  const translateY = useTransform(scrollYProgress, [0, 0.5], [30, 0])
-
   return (
-    <motion.div ref={ref} style={{ opacity, y: translateY }} className="relative pl-16 md:pl-0">
-      {/* Big number */}
-      <div className="md:absolute md:-left-20 md:top-0 absolute left-0 top-0 text-6xl font-black leading-none select-none"
-        style={{ color: step.color + '18', fontFamily: 'monospace' }}
-      >
-        {step.num}
-      </div>
+    <motion.div
+      initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      style={{
+        background: step.bg,
+        border: `1px solid ${step.color}25`,
+        borderRadius: 20, padding: '32px 28px',
+        position: 'relative', overflow: 'hidden',
+      }}
+    >
+      {/* Big number watermark */}
+      <div style={{
+        position: 'absolute', right: 20, top: 10,
+        fontSize: 80, fontWeight: 900, color: step.color,
+        opacity: 0.08, lineHeight: 1, pointerEvents: 'none',
+        fontFamily: 'monospace',
+      }}>{step.num}</div>
 
-      <div className="rounded-2xl border border-white/8 p-6 hover:border-white/15 transition-all"
-        style={{ background: `linear-gradient(135deg, ${step.color}08 0%, transparent 60%)` }}
-      >
-        <div className="flex items-center gap-3 mb-3">
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: step.color }}>{step.sub}</span>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-        <p className="text-sm text-slate-400 leading-relaxed">{step.desc}</p>
+      <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: step.color, marginBottom: 10 }}>
+        {step.sub}
       </div>
+      <h3 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.02em' }}>{step.title}</h3>
+      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7 }}>{step.desc}</p>
     </motion.div>
   )
 }
 
+// ── Main landing page ─────────────────────────────────────────
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
@@ -235,307 +359,305 @@ export default function LandingPage() {
   const ctaHref  = isLoggedIn ? '/dashboard' : '/auth/login'
   const ctaLabel = isLoggedIn ? 'Go to dashboard →' : 'Get started free'
 
-  const heroRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
-  const heroY     = useTransform(scrollYProgress, [0, 1], [0, 120])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
-
-  const [activeFeature, setActiveFeature] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => setActiveFeature(p => (p + 1) % FEATURES.length), 3000)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
-    <div className="min-h-screen bg-[#08080f] text-white overflow-x-hidden" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#08080f', color: '#fff', overflowX: 'hidden', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
 
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 py-4"
-        style={{ background: 'rgba(8,8,15,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'linear-gradient(135deg, #7c6af5, #a89ef8)' }}>⚡</div>
-          <span className="text-base font-bold tracking-tight">Creator OS</span>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="hidden md:flex items-center gap-6">
+      {/* ── Nav ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '14px 40px',
+        background: 'rgba(8,8,15,0.85)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <CreatorOSLogo size="sm" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {['Features', 'How it works', 'Pricing'].map(item => (
-            <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-sm text-slate-400 hover:text-white transition-colors">{item}</a>
+            <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`}
+              style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+              onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)'}
+            >{item}</a>
           ))}
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-3">
-          <Link href={ctaHref}
-            className="text-sm font-semibold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #7c6af5, #a89ef8)' }}
-          >
-            {isLoggedIn ? 'Dashboard' : 'Get started'}
-          </Link>
-        </motion.div>
+          <Link href={ctaHref} style={{
+            fontSize: 13, fontWeight: 700, padding: '8px 20px', borderRadius: 12,
+            background: 'linear-gradient(135deg, #7c6af5, #ec4899)',
+            color: '#fff', textDecoration: 'none',
+            boxShadow: '0 0 20px rgba(124,106,245,0.3)',
+          }}>{isLoggedIn ? 'Dashboard' : 'Get started'}</Link>
+        </div>
       </nav>
 
-      {/* Hero */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20 overflow-hidden">
-        <OrbField />
+      {/* ── Hero ── */}
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: 100, paddingBottom: 60, overflow: 'hidden' }}>
+        <GridBackground />
 
-        {/* Noise texture overlay */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")', backgroundSize: '200px 200px' }}
-        />
-
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center max-w-5xl mx-auto mb-12">
-          {/* Eyebrow */}
+        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: 800, margin: '0 auto', padding: '0 24px' }}>
+          {/* Eyebrow pill */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-violet-500/30 text-xs font-medium text-violet-300 mb-8"
-            style={{ background: 'rgba(124,106,245,0.1)' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '6px 16px', borderRadius: 30,
+              background: 'rgba(124,106,245,0.12)',
+              border: '1px solid rgba(124,106,245,0.35)',
+              fontSize: 12, fontWeight: 600, color: '#a89ef8',
+              marginBottom: 32,
+            }}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-            Built for Indian creators · Post in 3 minutes
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#7c6af5', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+            Built for creators · Post in 3 minutes
           </motion.div>
 
-          {/* Main headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black leading-none tracking-tight mb-6"
-            style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+          {/* Big headline */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}
           >
-            <span className="block text-white">From idea to</span>
-            <span className="block" style={{
-              background: 'linear-gradient(135deg, #7c6af5 0%, #ec4899 40%, #06b6d4 80%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
-            }}>
-              posted in 3 minutes.
-            </span>
-          </motion.h1>
+            <h1 style={{ fontSize: 'clamp(3rem, 8vw, 6.5rem)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', margin: '0 0 20px' }}>
+              <span style={{ display: 'block', color: '#fff' }}>From idea to</span>
+              <span style={{
+                display: 'block',
+                background: 'linear-gradient(135deg, #ff4d4d 0%, #f97316 25%, #7c6af5 60%, #06b6d4 100%)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              }}>
+                posted in 3 minutes.
+              </span>
+            </h1>
+          </motion.div>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
-            className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto mb-10"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }}
+            style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 560, margin: '0 auto 40px' }}
           >
             Creator OS finds what's trending, scripts your video, edits it automatically, and posts to Instagram and YouTube — while you focus on creating.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
+            style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}
           >
-            <Link href={ctaHref}
-              className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-white text-base transition-all hover:scale-105 hover:shadow-2xl"
-              style={{ background: 'linear-gradient(135deg, #7c6af5, #ec4899)', boxShadow: '0 0 40px rgba(124,106,245,0.3)' }}
+            <Link href={ctaHref} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '16px 36px', borderRadius: 16,
+              background: 'linear-gradient(135deg, #7c6af5, #ec4899)',
+              color: '#fff', fontWeight: 800, fontSize: 16, textDecoration: 'none',
+              boxShadow: '0 0 50px rgba(124,106,245,0.4), 0 8px 32px rgba(0,0,0,0.3)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+            }}
+              onMouseEnter={e => { (e.target as HTMLElement).style.transform = 'scale(1.04)' }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.transform = 'scale(1)' }}
             >
               {ctaLabel}
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
+              <span style={{ fontSize: 20 }}>→</span>
             </Link>
-            <a href="#how-it-works" className="flex items-center gap-2 px-6 py-4 rounded-2xl font-medium text-slate-300 hover:text-white text-base transition-all border border-white/10 hover:border-white/20 hover:bg-white/5">
-              See how it works
-              <span>↓</span>
-            </a>
+            <a href="#how-it-works" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '16px 28px', borderRadius: 16,
+              border: '1px solid rgba(255,255,255,0.12)',
+              color: 'rgba(255,255,255,0.6)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
+              background: 'rgba(255,255,255,0.04)',
+            }}>See how it works ↓</a>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Dashboard mockup */}
-        <motion.div
-          style={{ y: heroY }}
-          className="relative z-10 w-full max-w-4xl mx-auto px-4"
-        >
-          <DashboardMockup />
-        </motion.div>
+        <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 900, margin: '60px auto 0', padding: '0 20px' }}>
+          <DashboardCard />
+        </div>
       </section>
 
-      {/* Stats bar */}
-      <section className="relative z-10 border-y border-white/6 py-12" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {STATS.map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className="text-center"
-            >
-              <p className="text-4xl font-black text-white mb-1" style={{ background: 'linear-gradient(135deg, #7c6af5, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                {stat.value}
-              </p>
-              <p className="text-sm text-slate-500">{stat.label}</p>
+      {/* ── Stats bar ── */}
+      <section style={{ borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '48px 40px', background: 'rgba(255,255,255,0.02)' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, textAlign: 'center' }}>
+          {[
+            { v: '10×',   l: 'More content from one video' },
+            { v: '3 min', l: 'To process a full video' },
+            { v: '5+',    l: 'Platforms in one click' },
+            { v: '0',     l: 'Design skills needed' },
+          ].map((s, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+              <p style={{
+                fontSize: 42, fontWeight: 900, marginBottom: 6, letterSpacing: '-0.03em',
+                background: 'linear-gradient(135deg, #ff4d4d, #7c6af5, #06b6d4)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              }}>{s.v}</p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{s.l}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="relative z-10 py-32 px-6">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
-            <p className="text-xs font-bold uppercase tracking-widest text-violet-400 mb-4">How it works</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
-              Your entire content<br />workflow. Automated.
+      {/* ── How it works ── */}
+      <section id="how-it-works" style={{ padding: '100px 40px' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#7c6af5', marginBottom: 16 }}>How it works</p>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.1, color: '#fff' }}>
+              Your entire content workflow.<br />Automated.
             </h2>
           </motion.div>
 
-          <div className="relative space-y-6 md:pl-24">
-            {/* Vertical line */}
-            <div className="hidden md:block absolute left-8 top-3 bottom-3 w-px" style={{ background: 'linear-gradient(180deg, transparent, #7c6af5 20%, #ec4899 50%, #06b6d4 80%, transparent)' }} />
-
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
             {STEPS.map((step, i) => <StepCard key={i} step={step} index={i} />)}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="relative z-10 py-32 px-6" style={{ background: 'rgba(255,255,255,0.01)' }}>
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <p className="text-xs font-bold uppercase tracking-widest text-violet-400 mb-4">Features</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white">Everything a creator needs</h2>
+      {/* ── Features ── */}
+      <section id="features" style={{ padding: '100px 40px', background: 'rgba(255,255,255,0.015)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#ec4899', marginBottom: 16 }}>Features</p>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, letterSpacing: '-0.03em', color: '#fff' }}>Everything a creator needs</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
             {FEATURES.map((f, i) => (
-              <motion.div
-                key={i}
+              <motion.div key={i}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                whileHover={{ y: -4, borderColor: 'rgba(124,106,245,0.4)' }}
-                className="rounded-2xl border border-white/8 p-6 transition-all cursor-default"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
+                viewport={{ once: true }} transition={{ delay: i * 0.07 }}
+                whileHover={{ y: -6, borderColor: f.color + '50' }}
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: 20, padding: 28, cursor: 'default',
+                  transition: 'border-color 0.2s',
+                }}
               >
-                <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="text-base font-bold text-white mb-2">{f.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{f.desc}</p>
+                <div style={{ fontSize: 32, marginBottom: 16 }}>{f.icon}</div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>{f.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Creator pain points solved */}
-      <section className="relative z-10 py-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">We know the struggle.</h2>
-            <p className="text-lg text-slate-400">Every creator's pain point — solved.</p>
+      {/* ── Pain points ── */}
+      <section style={{ padding: '100px 40px' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: 56 }}>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, letterSpacing: '-0.03em', color: '#fff', marginBottom: 12 }}>We know the struggle.</h2>
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.4)' }}>Every creator's daily pain — solved.</p>
           </motion.div>
 
-          <div className="space-y-4">
-            {[
-              { pain: '"What should I make today?"', solution: 'AI shows you 20 trending ideas in your niche every morning.' },
-              { pain: '"I don\'t know how to edit."', solution: 'Upload your clips. The AI edits, captions, and exports automatically.' },
-              { pain: '"Captions take me an hour."', solution: 'Generate platform-specific captions and hashtags in 10 seconds.' },
-              { pain: '"I forget to post consistently."', solution: 'Schedule weeks of content in advance. Post at peak times automatically.' },
-              { pain: '"I made a video but only one piece of content."', solution: 'One video → Reel + Short + carousel + thread + newsletter.' },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {PAIN_POINTS.map((item, i) => (
+              <motion.div key={i}
+                initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                className="flex gap-6 items-start p-5 rounded-2xl border border-white/6 hover:border-white/12 transition-all"
-                style={{ background: 'rgba(255,255,255,0.02)' }}
+                style={{
+                  display: 'flex', gap: 20, alignItems: 'flex-start',
+                  background: 'rgba(255,255,255,0.025)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 16, padding: '18px 24px',
+                }}
               >
-                <div className="flex-shrink-0 mt-0.5">
-                  <span className="text-rose-400 text-sm line-through opacity-70 block leading-relaxed">{item.pain}</span>
-                </div>
-                <div className="w-px self-stretch bg-white/10 flex-shrink-0" />
-                <div>
-                  <span className="text-emerald-400 text-sm leading-relaxed">✓ {item.solution}</span>
-                </div>
+                <span style={{ fontSize: 14, color: 'rgba(239,68,68,0.7)', textDecoration: 'line-through', flex: '0 0 46%', lineHeight: 1.5 }}>{item.pain}</span>
+                <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+                <span style={{ fontSize: 14, color: '#4ade80', lineHeight: 1.5 }}>✓ {item.fix}</span>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="relative z-10 py-32 px-6" style={{ background: 'rgba(255,255,255,0.01)' }}>
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <p className="text-xs font-bold uppercase tracking-widest text-violet-400 mb-4">Pricing</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Simple, honest pricing</h2>
-            <p className="text-slate-400">Start free. Upgrade when you're ready to scale.</p>
+      {/* ── Pricing ── */}
+      <section id="pricing" style={{ padding: '100px 40px', background: 'rgba(255,255,255,0.015)' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: 56 }}>
+            <p style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#10b981', marginBottom: 16 }}>Pricing</p>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, letterSpacing: '-0.03em', color: '#fff', marginBottom: 10 }}>Simple pricing</h2>
+            <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.4)' }}>Start free. Upgrade when you're ready to scale.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
             {[
-              { name: 'Free', price: '₹0', period: '', features: ['2 ideas / month', '2 video uploads', '1 format export', 'Watermark on videos'], cta: 'Start free', highlight: false },
-              { name: 'Creator', price: '₹1,599', period: '/month', features: ['50 ideas / month', '20 video uploads', '3 format exports', 'No watermark', 'Scheduling', 'All AI features'], cta: 'Start creating', highlight: true },
-              { name: 'Pro', price: '₹3,999', period: '/month', features: ['Unlimited everything', 'Priority processing', 'Analytics dashboard', 'White-label exports', 'Early features'], cta: 'Go Pro', highlight: false },
+              { name: 'Free', price: '₹0', features: ['2 ideas/month', '2 video uploads', '1 format export', 'Watermark'], highlight: false, cta: 'Start free' },
+              { name: 'Creator', price: '₹1,599/mo', features: ['50 ideas/month', '20 video uploads', '3 format exports', 'No watermark', 'Scheduling'], highlight: true, cta: 'Start creating' },
+              { name: 'Pro', price: '₹3,999/mo', features: ['Unlimited everything', 'Priority processing', 'Analytics', 'White-label'], highlight: false, cta: 'Go Pro' },
             ].map((plan, i) => (
-              <motion.div
-                key={i}
+              <motion.div key={i}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className={`relative rounded-2xl p-6 border transition-all ${plan.highlight ? 'border-violet-500/50' : 'border-white/8'}`}
-                style={{ background: plan.highlight ? 'linear-gradient(135deg, rgba(124,106,245,0.15), rgba(236,72,153,0.08))' : 'rgba(255,255,255,0.03)' }}
+                style={{
+                  position: 'relative',
+                  background: plan.highlight ? 'linear-gradient(135deg, rgba(124,106,245,0.15), rgba(236,72,153,0.08))' : 'rgba(255,255,255,0.03)',
+                  border: plan.highlight ? '1px solid rgba(124,106,245,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 20, padding: 28,
+                }}
               >
                 {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold text-white px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg, #7c6af5, #ec4899)' }}>
+                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', fontSize: 10, fontWeight: 800, color: '#fff', padding: '4px 14px', borderRadius: 20, background: 'linear-gradient(135deg,#7c6af5,#ec4899)', whiteSpace: 'nowrap' }}>
                     Most popular
                   </div>
                 )}
-                <p className="text-base font-bold text-white mb-1">{plan.name}</p>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-3xl font-black text-white">{plan.price}</span>
-                  <span className="text-sm text-slate-500">{plan.period}</span>
-                </div>
-                <ul className="space-y-2.5 mb-8">
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{plan.name}</p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: '#fff', marginBottom: 20, letterSpacing: '-0.02em' }}>{plan.price}</p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
                   {plan.features.map(f => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-slate-300">
-                      <span className="text-emerald-400 text-xs">✓</span>{f}
+                    <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>
+                      <span style={{ color: '#4ade80', fontSize: 11 }}>✓</span>{f}
                     </li>
                   ))}
                 </ul>
-                <Link href={ctaHref}
-                  className={`block text-center py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 ${plan.highlight ? 'text-white' : 'text-slate-300 border border-white/15 hover:border-white/30'}`}
-                  style={plan.highlight ? { background: 'linear-gradient(135deg, #7c6af5, #ec4899)' } : {}}
-                >
-                  {plan.cta}
-                </Link>
+                <Link href={ctaHref} style={{
+                  display: 'block', textAlign: 'center', padding: '12px', borderRadius: 12,
+                  background: plan.highlight ? 'linear-gradient(135deg,#7c6af5,#ec4899)' : 'rgba(255,255,255,0.07)',
+                  border: plan.highlight ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                  color: '#fff', fontWeight: 700, fontSize: 14, textDecoration: 'none',
+                  transition: 'opacity 0.2s',
+                }}>{plan.cta}</Link>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative z-10 py-32 px-6 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 50%, rgba(124,106,245,0.15), transparent)' }} />
-        </div>
+      {/* ── Big CTA ── */}
+      <section style={{ padding: '120px 40px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(124,106,245,0.12), transparent)', pointerEvents: 'none' }} />
         <motion.div
-          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative max-w-2xl mx-auto text-center"
+          style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', position: 'relative' }}
         >
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
-            Your audience is<br />waiting. Let's go.
-          </h2>
-          <p className="text-lg text-slate-400 mb-10">
-            Join creators who are posting more, stressing less, and growing faster with Creator OS.
+          <CreatorOSLogo size="lg" />
+          <p style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 900, color: '#fff', margin: '28px 0 16px', letterSpacing: '-0.03em', lineHeight: 1.2 }}>
+            Your audience is waiting.<br />Let's go.
           </p>
-          <Link href={ctaHref}
-            className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-bold text-white text-lg transition-all hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #7c6af5, #ec4899)', boxShadow: '0 0 60px rgba(124,106,245,0.4)' }}
-          >
-            {ctaLabel}
-            <span className="text-xl">→</span>
+          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.45)', marginBottom: 40 }}>
+            Join creators posting more, stressing less, and growing faster.
+          </p>
+          <Link href={ctaHref} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 12,
+            padding: '18px 44px', borderRadius: 18,
+            background: 'linear-gradient(135deg, #7c6af5, #ec4899)',
+            color: '#fff', fontWeight: 800, fontSize: 17, textDecoration: 'none',
+            boxShadow: '0 0 60px rgba(124,106,245,0.4), 0 12px 40px rgba(0,0,0,0.4)',
+          }}>
+            {ctaLabel} <span style={{ fontSize: 22 }}>→</span>
           </Link>
-          <p className="text-xs text-slate-600 mt-4">No credit card required. Free forever plan available.</p>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', marginTop: 16 }}>No credit card · Free plan available</p>
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/6 py-8 px-6">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs" style={{ background: 'linear-gradient(135deg, #7c6af5, #a89ef8)' }}>⚡</div>
-            <span className="text-sm font-bold text-white">Creator OS</span>
-          </div>
-          <p className="text-xs text-slate-600">Built for creators in India. Post more. Stress less.</p>
-          <div className="flex gap-6">
-            <Link href="/dashboard" className="text-xs text-slate-500 hover:text-white transition-colors">Dashboard</Link>
-          </div>
+      {/* ── Footer ── */}
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        <CreatorOSLogo size="sm" />
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>Built for creators in India. Post more. Stress less.</p>
+        <div style={{ display: 'flex', gap: 24 }}>
+          <Link href={ctaHref} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>{isLoggedIn ? 'Dashboard' : 'Get started'}</Link>
         </div>
       </footer>
+
+      <style>{`
+        @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+      `}</style>
     </div>
   )
 }
