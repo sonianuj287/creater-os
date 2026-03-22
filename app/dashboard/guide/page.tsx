@@ -4,11 +4,12 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  FileText, Film, Target, Lightbulb, Sparkles,
+  FileText, Film, Target, Lightbulb, Sparkles, Combine,
   ChevronDown, ChevronUp, Copy, CheckCheck,
   RefreshCw, ArrowRight, Loader2, ExternalLink,
 } from 'lucide-react'
 import { generateScript, generateShotList, type ScriptSection } from '@/lib/api'
+import { ScriptVideoAssembler } from '@/components/guide/ScriptVideoAssembler'
 import { NICHES, PLATFORMS, FORMATS, cn, getNicheEmoji } from '@/lib/utils'
 import type { Niche, Platform, ContentFormat } from '@/types'
 
@@ -140,7 +141,7 @@ function GuidePage() {
   const [shotList, setShotList]               = useState<any>(null)
   const [error, setError]                     = useState('')
 
-  const [activeTab, setActiveTab] = useState<'setup' | 'script' | 'shots'>('setup')
+  const [activeTab, setActiveTab] = useState<'setup' | 'script' | 'shots' | 'assemble'>('setup')
 
   useEffect(() => {
     const t = searchParams.get('title')
@@ -215,13 +216,15 @@ function GuidePage() {
         {/* Tab bar */}
         <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-6">
           {([
-            { id: 'setup',  label: 'Setup',       icon: Sparkles },
-            { id: 'script', label: 'Script',       icon: FileText },
-            { id: 'shots',  label: 'Shot list',    icon: Film },
+            { id: 'setup',    label: 'Setup',     icon: Sparkles },
+            { id: 'script',   label: 'Script',    icon: FileText },
+            { id: 'shots',    label: 'Shot list', icon: Film },
+            { id: 'assemble', label: 'Assemble',  icon: Combine },
           ] as const).map(t => {
             const Icon = t.icon
             const isLocked = (t.id === 'script' && !scriptSections.length) ||
-                             (t.id === 'shots' && !shotList)
+                             (t.id === 'shots' && !shotList) ||
+                             (t.id === 'assemble' && !scriptSections.length)
             return (
               <button
                 key={t.id}
