@@ -12,6 +12,7 @@ import { MOCK_IDEAS } from '@/lib/mock-data'
 import { createClient } from '@/lib/supabase'
 import type { FilterState, Idea, MonetisationGoal } from '@/types'
 import { cn, getNicheEmoji } from '@/lib/utils'
+import { OnboardingTour, useTour } from '@/components/ui/OnboardingTour'
 
 const DEFAULT_FILTERS: FilterState = {
   niche: 'all', platform: 'all', format: 'all', difficulty: 'all',
@@ -19,6 +20,7 @@ const DEFAULT_FILTERS: FilterState = {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { showTour, completeTour } = useTour()
   const [filters, setFilters]         = useState<FilterState>(DEFAULT_FILTERS)
   const [search, setSearch]           = useState('')
   const [ideas, setIdeas]             = useState<Idea[]>(MOCK_IDEAS)
@@ -285,6 +287,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      {/* First-time tour */}
+      {showTour && <OnboardingTour onComplete={completeTour} />}
     </div>
   )
 }

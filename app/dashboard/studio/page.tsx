@@ -1,11 +1,13 @@
 'use client'
 
+
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Sparkles, ArrowRight, Lightbulb, Zap,
   ChevronDown, ChevronUp, Clock, RefreshCw,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { generateIdeas, type IdeaVariant, type HookVariant } from '@/lib/api'
 import { NICHES, PLATFORMS, cn, getDifficultyColor, getFormatLabel, getNicheEmoji } from '@/lib/utils'
 import type { Niche, Platform } from '@/types'
@@ -33,6 +35,7 @@ const HOOK_STYLE_COLORS: Record<string, string> = {
 }
 
 function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
+  const router = useRouter()   // ← add this line
   const [expanded, setExpanded] = useState(index === 0)
   const [selectedHook, setSelectedHook] = useState(0)
 
@@ -132,7 +135,10 @@ function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
                   <Zap size={11} />
                   Best format: {getFormatLabel(idea.recommended_format as any)}
                 </span>
-                <button className="btn-primary text-xs flex items-center gap-1.5 py-2">
+                <button
+                  onClick={() => router.push(`/dashboard/guide?title=${encodeURIComponent(idea.title)}`)}
+                  className="btn-primary text-xs flex items-center gap-1.5 py-2"
+                >
                   Use this idea
                   <ArrowRight size={12} />
                 </button>
@@ -146,6 +152,7 @@ function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
 }
 
 export default function StudioPage() {
+  const router = useRouter()
   const [prompt, setPrompt]         = useState('')
   const [niche, setNiche]           = useState<Niche>('finance')
   const [platforms, setPlatforms]   = useState<Platform[]>(['instagram', 'youtube'])

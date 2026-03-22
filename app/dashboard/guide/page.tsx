@@ -477,12 +477,43 @@ function GuidePage() {
             <div className="bg-accent/10 border border-accent/20 rounded-2xl p-5 flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-white mb-0.5">Ready to film?</p>
-                <p className="text-xs text-slate-400">Upload your footage to the Editor when done.</p>
+                <p className="text-xs text-slate-400">Film each scene then use the Assemble tab to combine them.</p>
               </div>
-              <a href="/dashboard/editor" className="btn-primary text-xs flex items-center gap-1.5 flex-shrink-0">
-                Go to Editor <ArrowRight size={12} />
-              </a>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveTab('assemble')}
+                  className="btn-primary text-xs flex items-center gap-1.5 py-2 flex-shrink-0"
+                >
+                  <Combine size={12} /> Assemble scenes
+                </button>
+              </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Assemble tab */}
+        {activeTab === 'assemble' && scriptSections.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <div className="bg-surface border border-border rounded-2xl p-4">
+              <p className="text-sm font-semibold text-white mb-1">How to use the Scene Assembler</p>
+              <ol className="space-y-1.5 mt-3">
+                {[
+                  'Film each script section as a separate short clip',
+                  'Upload each clip to its matching section below',
+                  'Click "Assemble" — AI combines, captions, and exports',
+                  'Download your finished video in 3 formats',
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-xs text-slate-400">
+                    <span className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5">{i + 1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <ScriptVideoAssembler
+              sections={scriptSections}
+              projectTitle={title}
+            />
           </motion.div>
         )}
       </div>
