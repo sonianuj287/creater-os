@@ -9,6 +9,7 @@ import {
   Eye, ArrowRight, RefreshCw,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { usePlanGate, UsageBar, UpgradePrompt } from '@/components/ui/PlanGate'
 import { cn } from '@/lib/utils'
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
@@ -157,6 +158,7 @@ function VideoPreview({ url, label }: { url: string; label: string }) {
 }
 
 export default function EditorPage() {
+  const { usage, canUpload, reload: reloadUsage } = usePlanGate()
   const [file, setFile]               = useState<File | null>(null)
   const [dragOver, setDragOver]       = useState(false)
   const [status, setStatus]           = useState<JobStatus>('idle')
@@ -211,6 +213,10 @@ export default function EditorPage() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: file.name, content_type: file.type, user_id: user.id, project_id: project.id }),
       })
+      if (urlRes.status === 402) {
+        const err = await urlRes.json()
+        throw new Error(err.detail?.message ?? 'Upload limit reached. Upgrade to continue.')
+      }
       if (!urlRes.ok) throw new Error('Failed to get upload URL')
       const { upload_url, key } = await urlRes.json()
 

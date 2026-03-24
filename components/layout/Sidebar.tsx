@@ -29,7 +29,7 @@ const PLAN_COLORS: Record<string, string> = {
   pro:     'text-purple-300 bg-purple-500/15 border-purple-500/30',
 }
 
-const UPI_ID = 'sonianuj287@ybl' // Replace with your UPI ID
+const UPI_ID = 'your-upi-id@upi' // Replace with your UPI ID
 
 function UpgradeModal({ onClose, userId }: { onClose: () => void; userId: string }) {
   const [selectedPlan, setSelectedPlan] = useState<'creator' | 'pro'>('creator')
@@ -42,14 +42,14 @@ function UpgradeModal({ onClose, userId }: { onClose: () => void; userId: string
     {
       id: 'creator' as const,
       name: 'Creator',
-      price: '₹1,599',
+      price: '₹100',
       period: '/month',
       features: ['50 ideas/month', '20 uploads/month', 'No watermark', 'Scheduling'],
     },
     {
       id: 'pro' as const,
       name: 'Pro',
-      price: '₹3,999',
+      price: '₹350',
       period: '/month',
       features: ['Unlimited everything', 'Priority processing', 'Analytics', 'White-label'],
     },

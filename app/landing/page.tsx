@@ -574,8 +574,8 @@ export default function LandingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
             {[
               { name: 'Free', price: '₹0', features: ['2 ideas/month', '2 video uploads', '1 format export', 'Watermark'], highlight: false, cta: 'Start free' },
-              { name: 'Creator', price: '₹1,599/mo', features: ['50 ideas/month', '20 video uploads', '3 format exports', 'No watermark', 'Scheduling'], highlight: true, cta: 'Start creating' },
-              { name: 'Pro', price: '₹3,999/mo', features: ['Unlimited everything', 'Priority processing', 'Analytics', 'White-label'], highlight: false, cta: 'Go Pro' },
+              { name: 'Creator', price: '₹100/mo', features: ['50 ideas/month', '20 video uploads', '3 format exports', 'No watermark', 'Scheduling'], highlight: true, cta: 'Start creating' },
+              { name: 'Pro', price: '₹350/mo', features: ['Unlimited everything', 'Priority processing', 'Analytics', 'White-label'], highlight: false, cta: 'Go Pro' },
             ].map((plan, i) => (
               <motion.div key={i}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -624,7 +624,7 @@ export default function LandingPage() {
         >
           <CreatorOSLogo size="lg" />
           <p style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 900, color: '#fff', margin: '28px 0 16px', letterSpacing: '-0.03em', lineHeight: 1.2 }}>
-            Your audience is waiting.
+            Your audience is waiting.<br />Let's go.
           </p>
           <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.45)', marginBottom: 40 }}>
             Join creators posting more, stressing less, and growing faster.

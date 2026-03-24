@@ -8,6 +8,7 @@ import {
   ChevronDown, ChevronUp, Clock, RefreshCw,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { usePlanGate, UsageBar } from '@/components/ui/PlanGate'
 import { generateIdeas, type IdeaVariant, type HookVariant } from '@/lib/api'
 import { NICHES, PLATFORMS, cn, getDifficultyColor, getFormatLabel, getNicheEmoji } from '@/lib/utils'
 import type { Niche, Platform } from '@/types'
@@ -153,6 +154,7 @@ function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
 
 export default function StudioPage() {
   const router = useRouter()
+  const { usage, canGenerate } = usePlanGate()
   const [prompt, setPrompt]         = useState('')
   const [niche, setNiche]           = useState<Niche>('finance')
   const [platforms, setPlatforms]   = useState<Platform[]>(['instagram', 'youtube'])
@@ -262,7 +264,7 @@ export default function StudioPage() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  AI is generating your ideas...
+                  Gemini is generating your ideas...
                 </>
               ) : (
                 <>

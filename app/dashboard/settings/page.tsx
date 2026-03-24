@@ -29,7 +29,7 @@ const PLANS = [
   {
     id:    'creator',
     name:  'Creator',
-    price: '₹1,599',
+    price: '₹100',
     period: '/month',
     color: 'border-accent/50',
     badge: 'Most popular',
@@ -47,7 +47,7 @@ const PLANS = [
   {
     id:    'pro',
     name:  'Pro',
-    price: '₹3,999',
+    price: '₹350',
     period: '/month',
     color: 'border-purple-500/40',
     features: [

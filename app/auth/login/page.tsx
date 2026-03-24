@@ -14,11 +14,9 @@ export default function LoginPage() {
 
   async function handleGoogleLogin() {
     setLoading(true)
-    // Store redirect destination before OAuth
-    localStorage.setItem('auth_redirect', '/dashboard')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
     })
     if (error) { setError(error.message); setLoading(false) }
   }
