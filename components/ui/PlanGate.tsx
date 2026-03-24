@@ -259,7 +259,7 @@ function UpgradeModal({ onClose }: { onClose: () => void }) {
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 mb-0.5">UPI ID</p>
-                    <p className="text-sm font-mono font-bold text-white">your-upi@upi</p>
+                    <p className="text-sm font-mono font-bold text-white">sonianuj287@ybl</p>
                     <p className="text-[10px] text-slate-500 mt-2">
                       Pay {selected === 'creator' ? '₹100' : '₹350'} then paste the key below
                     </p>
