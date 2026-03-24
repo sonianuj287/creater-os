@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  const code  = searchParams.get('code')
+  const code = searchParams.get('code')
 
   if (code) {
     const supabase = createServerComponentClient()
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Existing user — go straight to dashboard
+      // Existing user — go to dashboard
       return NextResponse.redirect(`${origin}/dashboard`)
     }
   }

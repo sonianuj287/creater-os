@@ -624,7 +624,7 @@ export default function LandingPage() {
         >
           <CreatorOSLogo size="lg" />
           <p style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 900, color: '#fff', margin: '28px 0 16px', letterSpacing: '-0.03em', lineHeight: 1.2 }}>
-            Your audience is waiting.<br />Let's go.
+            Your audience is waiting.
           </p>
           <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.45)', marginBottom: 40 }}>
             Join creators posting more, stressing less, and growing faster.

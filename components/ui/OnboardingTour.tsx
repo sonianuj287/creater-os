@@ -81,12 +81,20 @@ export function OnboardingTour({ onComplete }: TourProps) {
                 Quick tour · {step + 1}/{TOUR_STEPS.length}
               </span>
             </div>
-            <button
-              onClick={onComplete}
-              className="text-slate-500 hover:text-white transition-colors"
-            >
-              <X size={15} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onComplete}
+                className="text-xs text-slate-500 hover:text-slate-300 transition-colors px-2 py-1 rounded hover:bg-white/5"
+              >
+                Skip
+              </button>
+              <button
+                onClick={onComplete}
+                className="text-slate-500 hover:text-white transition-colors"
+              >
+                <X size={15} />
+              </button>
+            </div>
           </div>
 
           {/* Content */}
