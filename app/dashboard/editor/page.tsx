@@ -9,6 +9,7 @@ import {
   Eye, ArrowRight, RefreshCw,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { AIToolsPanel } from '@/components/editor/AIToolsPanel'
 import { usePlanGate, UsageBar, UpgradePrompt } from '@/components/ui/PlanGate'
 import { cn } from '@/lib/utils'
 
@@ -159,6 +160,7 @@ function VideoPreview({ url, label }: { url: string; label: string }) {
 
 export default function EditorPage() {
   const { usage, canUpload, reload: reloadUsage } = usePlanGate()
+  const [projectTitle, setProjectTitle] = useState('')
   const [file, setFile]               = useState<File | null>(null)
   const [dragOver, setDragOver]       = useState(false)
   const [status, setStatus]           = useState<JobStatus>('idle')
