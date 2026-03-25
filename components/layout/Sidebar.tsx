@@ -9,6 +9,7 @@ import {
   Crown, X, Check, ChevronUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { GiftCardInput } from '@/components/ui/GiftCard'
 import { signOut, createClient } from '@/lib/supabase'
 import { useState, useEffect } from 'react'
 
@@ -110,6 +111,38 @@ function UpgradeModal({ onClose, userId }: { onClose: () => void; userId: string
             </div>
           ) : (
             <>
+              {/* Mode toggle */}
+              <div className="flex gap-1 bg-white/5 rounded-xl p-1 mb-2">
+                <button id="tab-gift" onClick={() => {
+                  document.getElementById('tab-gift')!.style.background='rgba(124,106,245,0.2)'
+                  document.getElementById('tab-gift')!.style.color='#a89ef8'
+                  document.getElementById('tab-plans')!.style.background='transparent'
+                  document.getElementById('tab-plans')!.style.color='rgba(255,255,255,0.4)'
+                  document.getElementById('pane-gift')!.style.display='block'
+                  document.getElementById('pane-plans')!.style.display='none'
+                }} style={{flex:1,padding:'6px',borderRadius:8,border:'none',background:'rgba(124,106,245,0.2)',color:'#a89ef8',fontSize:12,fontWeight:700,cursor:'pointer'}}>
+                  Gift Card
+                </button>
+                <button id="tab-plans" onClick={() => {
+                  document.getElementById('tab-plans')!.style.background='rgba(124,106,245,0.2)'
+                  document.getElementById('tab-plans')!.style.color='#a89ef8'
+                  document.getElementById('tab-gift')!.style.background='transparent'
+                  document.getElementById('tab-gift')!.style.color='rgba(255,255,255,0.4)'
+                  document.getElementById('pane-plans')!.style.display='block'
+                  document.getElementById('pane-gift')!.style.display='none'
+                }} style={{flex:1,padding:'6px',borderRadius:8,border:'none',background:'transparent',color:'rgba(255,255,255,0.4)',fontSize:12,fontWeight:700,cursor:'pointer'}}>
+                  Buy Plan
+                </button>
+              </div>
+
+              {/* Gift card pane */}
+              <div id="pane-gift">
+                <GiftCardInput compact onSuccess={() => { onClose(); window.location.reload() }} />
+              </div>
+
+              {/* Plans pane */}
+              <div id="pane-plans" style={{display:'none'}}>
+
               {/* Plan selector */}
               <div className="grid grid-cols-2 gap-3">
                 {PLANS.map(plan => (
@@ -139,6 +172,8 @@ function UpgradeModal({ onClose, userId }: { onClose: () => void; userId: string
                   </button>
                 ))}
               </div>
+
+              </div>{/* end plans pane */}
 
               {/* UPI Payment */}
               <div className="bg-white/5 border border-border rounded-xl p-4">

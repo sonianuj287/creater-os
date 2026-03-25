@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Settings, Zap, CheckCircle, Loader2, ExternalLink } from 'lucide-react'
+import { Settings, Zap, CheckCircle, Loader2, ExternalLink, Gift } from 'lucide-react'
+import { GiftCardInput } from '@/components/ui/GiftCard'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
@@ -269,6 +270,22 @@ export default function SettingsPage() {
             })}
           </div>
         </div>
+
+        {/* Gift card redemption */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+          className="mb-6"
+        >
+          <p className="section-label mb-4 flex items-center gap-2">
+            <Gift size={12} className="text-accent" />
+            Have a gift card?
+          </p>
+          <GiftCardInput onSuccess={(plan) => {
+            window.location.reload()
+          }} />
+        </motion.div>
 
         {/* Profile settings */}
         <motion.div
