@@ -34,7 +34,7 @@ const PAIN_POINTS = [
 ]
 
 // ── Logo Component ────────────────────────────────────────────
-function CreatorOSLogo({ size = 'lg' }: { size?: 'sm' | 'lg' }) {
+function CreaterosLogo({ size = 'lg' }: { size?: 'sm' | 'lg' }) {
   const fontSize = size === 'lg' ? '5.5rem' : '1.1rem'
   const iconSize = size === 'lg' ? 56 : 24
   const iconRadius = size === 'lg' ? 16 : 8
@@ -54,7 +54,7 @@ function CreatorOSLogo({ size = 'lg' }: { size?: 'sm' | 'lg' }) {
           fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.03em',
           background: 'linear-gradient(135deg, #fff 0%, #a89ef8 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-        }}>Creator OS</span>
+        }}>Createros</span>
       </div>
     )
   }
@@ -93,7 +93,7 @@ function CreatorOSLogo({ size = 'lg' }: { size?: 'sm' | 'lg' }) {
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
         }}>
-          Creator OS
+          Createros
         </span>
       </motion.div>
     </div>
@@ -206,7 +206,7 @@ function DashboardCard() {
             <div style={{ width: 150, background: '#0a0a12', borderRight: '1px solid rgba(255,255,255,0.05)', padding: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 8px 16px' }}>
                 <div style={{ width: 22, height: 22, borderRadius: 6, background: 'linear-gradient(135deg,#7c6af5,#ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚡</div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>Creator OS</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>Createros</span>
               </div>
               {[
                 { label: 'Feed', active: true, dot: '#7c6af5' },
@@ -370,7 +370,7 @@ export default function LandingPage() {
         background: 'rgba(8,8,15,0.85)', backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}>
-        <CreatorOSLogo size="sm" />
+        <CreaterosLogo size="sm" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {['Features', 'How it works', 'Pricing'].map(item => (
             <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`}
@@ -429,7 +429,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }}
             style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 560, margin: '0 auto 40px' }}
           >
-            Creator OS finds what's trending, scripts your video, edits it automatically, and posts to Instagram and YouTube — while you focus on creating.
+            Createros finds what's trending, scripts your video, edits it automatically, and posts to Instagram and YouTube — while you focus on creating.
           </motion.p>
 
           <motion.div
@@ -622,7 +622,7 @@ export default function LandingPage() {
           viewport={{ once: true }}
           style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', position: 'relative' }}
         >
-          <CreatorOSLogo size="lg" />
+          <CreaterosLogo size="lg" />
           <p style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 900, color: '#fff', margin: '28px 0 16px', letterSpacing: '-0.03em', lineHeight: 1.2 }}>
             Your audience is waiting.<br />Let's go.
           </p>
@@ -644,7 +644,7 @@ export default function LandingPage() {
 
       {/* ── Footer ── */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-        <CreatorOSLogo size="sm" />
+        <CreaterosLogo size="sm" />
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>Built for creators in India. Post more. Stress less.</p>
         <div style={{ display: 'flex', gap: 24 }}>
           <Link href={ctaHref} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>{isLoggedIn ? 'Dashboard' : 'Get started'}</Link>

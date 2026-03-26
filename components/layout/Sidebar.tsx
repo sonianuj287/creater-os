@@ -279,7 +279,7 @@ export function Sidebar() {
             <div className="w-7 h-7 bg-accent/20 border border-accent/40 rounded-lg flex items-center justify-center group-hover:bg-accent/30 transition-colors">
               <Zap size={14} className="text-accent" />
             </div>
-            <span className="font-semibold text-sm text-white">Creator OS</span>
+            <span className="font-semibold text-sm text-white">create<span style={{background:'linear-gradient(135deg,#ff4d4d,#f97316,#7c6af5)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>r</span>os</span>
           </Link>
         </div>
 
