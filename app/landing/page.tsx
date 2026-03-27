@@ -646,7 +646,8 @@ export default function LandingPage() {
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <CreaterosLogo size="sm" />
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>Built for creators in India. Post more. Stress less.</p>
-        <div style={{ display: 'flex', gap: 24 }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+          <Link href="/privacy" style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Privacy Policy</Link>
           <Link href={ctaHref} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>{isLoggedIn ? 'Dashboard' : 'Get started'}</Link>
         </div>
       </footer>
