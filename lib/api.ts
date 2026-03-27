@@ -25,6 +25,7 @@ export async function getTrendingIdeas(niche = "all", limit = 20) {
 // ── Idea Studio ───────────────────────────────────────────────
 
 export interface IdeaGenerateRequest {
+  user_id: string
   prompt: string
   niche: string
   platforms: string[]

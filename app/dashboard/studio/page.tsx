@@ -154,7 +154,7 @@ function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
 
 export default function StudioPage() {
   const router = useRouter()
-  const { usage, canGenerate } = usePlanGate()
+  const { usage, canGenerate, userId } = usePlanGate()
   const [prompt, setPrompt]         = useState('')
   const [niche, setNiche]           = useState<Niche>('finance')
   const [platforms, setPlatforms]   = useState<Platform[]>(['instagram', 'youtube'])
@@ -176,6 +176,7 @@ export default function StudioPage() {
 
     try {
       const result = await generateIdeas({
+        user_id: userId,
         prompt,
         niche,
         platforms,

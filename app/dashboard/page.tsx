@@ -82,6 +82,7 @@ export default function DashboardPage() {
       if (topTwo.length < 2) return
       const prompt = `Combine these two ideas into one unique video concept: "${topTwo[0].title}" and "${topTwo[1].title}"`
       const result = await generateIdeas({
+        user_id: profile.id,
         prompt,
         niche: profile.niche ?? 'lifestyle',
         platforms: profile.platforms ?? ['instagram'],
