@@ -70,9 +70,10 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
     }))
   }
 
-  async function uploadScene(sectionKey: string) {
+  async function uploadScene(sectionKey: string, actualFile?: File) {
     const scene = scenes[sectionKey]
-    if (!scene.file) return
+    const file = actualFile || scene.file
+    if (!file) return
 
     setScenes(prev => ({ ...prev, [sectionKey]: { ...prev[sectionKey], status: 'uploading', progress: 0 } }))
 
@@ -85,8 +86,8 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
       const urlRes = await fetch(`${BACKEND}/media/upload-url`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename: `${sectionKey}_${scene.file.name}`,
-          content_type: scene.file.type,
+          filename: `${sectionKey}_${file.name}`,
+          content_type: file.type,
           user_id: user.id,
           project_id: projectId ?? 'assembler',
         }),
@@ -109,8 +110,8 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
         }
         xhr.onerror = () => reject(new Error('Network error'))
         xhr.open('PUT', upload_url)
-        xhr.setRequestHeader('Content-Type', scene.file!.type)
-        xhr.send(scene.file)
+        xhr.setRequestHeader('Content-Type', file.type)
+        xhr.send(file)
       })
 
       setScenes(prev => ({ ...prev, [sectionKey]: { ...prev[sectionKey], status: 'done', progress: 100, uploadKey: key } }))
@@ -317,7 +318,10 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
                       type="file" accept="video/*" className="hidden"
                       onChange={e => {
                         const f = e.target.files?.[0]
-                        if (f) { handleFileSelect(section.section, f); setTimeout(() => uploadScene(section.section), 100) }
+                        if (f) { 
+                          handleFileSelect(section.section, f)
+                          uploadScene(section.section, f) 
+                        }
                       }}
                     />
                     <div className={cn(
