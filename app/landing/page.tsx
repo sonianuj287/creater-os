@@ -139,88 +139,90 @@ function ScrollShowcase() {
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] })
   
-  // Transform scale and opacity for 3D physics depth effect
-  const mainScale = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0.95, 1, 1, 0.9])
-  const perspectiveY = useTransform(scrollYProgress, [0, 1], [20, -10])
-  
   // Big floating text scale and fade
   const textScale = useTransform(scrollYProgress, [0, 0.15], [1, 7])
   const textOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0])
 
-  // Sequential UI Card Entrances
-  const card1Y = useTransform(scrollYProgress, [0.05, 0.25], [800, 0])
-  const card1Rot = useTransform(scrollYProgress, [0.05, 0.3], [15, 0])
-  
-  const card2Y = useTransform(scrollYProgress, [0.35, 0.55], [800, 0])
-  const card2Rot = useTransform(scrollYProgress, [0.35, 0.6], [15, 0])
-  
-  const card3Y = useTransform(scrollYProgress, [0.65, 0.85], [1000, 0])
-  
-  // Content crossfades
-  const bgOpacity1 = useTransform(scrollYProgress, [0, 0.35], [1, 0.1])
-  const bgOpacity2 = useTransform(scrollYProgress, [0.35, 0.45, 0.6, 0.7], [0, 1, 1, 0.2])
-  const bgOpacity3 = useTransform(scrollYProgress, [0.65, 0.75], [0, 1])
+  // Card 1: [0.1 - 0.45]
+  const card1Y = useTransform(scrollYProgress, [0.1, 0.2, 0.35, 0.45], ["50vh", "0vh", "0vh", "-50vh"])
+  const card1Opacity = useTransform(scrollYProgress, [0.1, 0.15, 0.35, 0.45], [0, 1, 1, 0])
+  const card1Scale = useTransform(scrollYProgress, [0.1, 0.2, 0.35, 0.45], [0.85, 1, 1, 1.15])
+
+  // Card 2: [0.4 - 0.75]
+  const card2Y = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], ["50vh", "0vh", "0vh", "-50vh"])
+  const card2Opacity = useTransform(scrollYProgress, [0.4, 0.45, 0.65, 0.75], [0, 1, 1, 0])
+  const card2Scale = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], [0.85, 1, 1, 1.15])
+
+  // Card 3: [0.7 - 1.0]
+  const card3Y = useTransform(scrollYProgress, [0.7, 0.8], ["50vh", "0vh"])
+  const card3Opacity = useTransform(scrollYProgress, [0.7, 0.75], [0, 1])
+  const card3Scale = useTransform(scrollYProgress, [0.7, 0.8], [0.85, 1])
+
+  // Background crossfades
+  const bgOpacity1 = useTransform(scrollYProgress, [0, 0.1, 0.35, 0.45], [0, 1, 1, 0])
+  const bgOpacity2 = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], [0, 1, 1, 0])
+  const bgOpacity3 = useTransform(scrollYProgress, [0.7, 0.8], [0, 1])
 
   return (
     <div ref={containerRef} className="h-[400vh] relative w-full border-t border-white/5 bg-[#050508]">
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden perspective-[1200px]">
+      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
         
         {/* Massive scrolling text */}
         <motion.div style={{ scale: textScale, opacity: textOpacity }} className="absolute z-10 pointer-events-none flex flex-col items-center justify-center">
-          <h2 className="text-[120px] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 text-center mix-blend-overlay">
+          <h2 className="text-[120px] md:text-[180px] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 text-center mix-blend-overlay">
             SCALE<br/>10X
           </h2>
         </motion.div>
 
-        {/* Dynamic Background Halos corresponding to current card */}
-        <motion.div style={{ opacity: bgOpacity1 }} className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,_rgba(124,106,245,0.15)_0%,_transparent_50%)]" />
-        <motion.div style={{ opacity: bgOpacity2 }} className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(6,182,212,0.15)_0%,_transparent_60%)]" />
-        <motion.div style={{ opacity: bgOpacity3 }} className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,_rgba(236,72,153,0.15)_0%,_transparent_60%)]" />
+        {/* Dynamic Background Halos */}
+        <motion.div style={{ opacity: bgOpacity1 }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(124,106,245,0.15)_0%,_transparent_60%)]" />
+        <motion.div style={{ opacity: bgOpacity2 }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(6,182,212,0.15)_0%,_transparent_60%)]" />
+        <motion.div style={{ opacity: bgOpacity3 }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(236,72,153,0.15)_0%,_transparent_60%)]" />
 
-        {/* 3D Moving Container */}
-        <motion.div style={{ scale: mainScale, rotateX: perspectiveY }} className="relative w-[90%] max-w-6xl aspect-video mx-auto transform-style-3d">
+        {/* Sequence Container */}
+        <div className="relative w-[90%] max-w-5xl aspect-video mx-auto flex items-center justify-center perspective-[1200px]">
             
-            {/* Card 1: Dashboard UI */}
-            <motion.div style={{ y: card1Y, rotateX: card1Rot, zIndex: 10 }} className="absolute right-0 top-0 w-3/5 rounded-3xl overflow-hidden glass-panel">
-               <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-md">
-                 <span className="text-[10px] font-bold tracking-widest text-[#7c6af5] uppercase">Analytics</span>
+            {/* Scene 1: Dashboard UI */}
+            <motion.div style={{ y: card1Y, opacity: card1Opacity, scale: card1Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden glass-panel border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)]">
+               <div className="p-3 md:p-4 bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-md">
+                 <span className="text-[10px] md:text-xs font-bold tracking-widest text-[#7c6af5] uppercase">Viral Analytics</span>
                  <div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-rose-500"/><div className="w-2.5 h-2.5 rounded-full bg-amber-500"/><div className="w-2.5 h-2.5 rounded-full bg-emerald-500"/></div>
                </div>
-               <img src="/assets/hero_dashboard_3d_1774778004295.png" alt="Analytics View" className="w-full object-cover scale-[1.02] transform origin-top" />
+               <img src="/assets/hero_dashboard_3d_1774778004295.png" alt="Analytics View" className="w-full object-cover scale-[1.02]" />
                
                {/* Floating Tag */}
-               <motion.div style={{ translateY: useTransform(scrollYProgress, [0.2, 0.4], [50, -20]) }} className="absolute -left-12 top-20 bg-black/80 backdrop-blur-xl border border-[#7c6af5]/40 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                 <span className="text-xl">📈</span> <span className="text-sm font-bold">Track Viral Scores</span>
+               <motion.div className="absolute -left-2 md:-left-6 top-16 md:top-20 bg-black/80 backdrop-blur-xl border border-[#7c6af5]/40 text-white px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3">
+                 <span className="text-lg md:text-xl">📈</span> <span className="text-xs md:text-sm font-bold">Track Viral Scores</span>
                </motion.div>
             </motion.div>
 
-            {/* Card 2: Timeline Editor UI */}
-            <motion.div style={{ y: card2Y, rotateX: card2Rot, zIndex: 20 }} className="absolute left-[5%] top-[15%] w-[65%] rounded-3xl overflow-hidden glass-panel shadow-[0_40px_100px_rgba(0,0,0,0.8)]">
-               <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-md">
-                 <span className="text-[10px] font-bold tracking-widest text-[#06b6d4] uppercase">Timeline Engine</span>
+            {/* Scene 2: Timeline Editor UI */}
+            <motion.div style={{ y: card2Y, opacity: card2Opacity, scale: card2Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden glass-panel border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)]">
+               <div className="p-3 md:p-4 bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-md">
+                 <span className="text-[10px] md:text-xs font-bold tracking-widest text-[#06b6d4] uppercase">Timeline Engine</span>
                </div>
                <img src="/assets/timeline_editor_3d_1774778024239.png" alt="Timeline Editor" className="w-full object-cover scale-[1.01]" />
                
                {/* Floating Tag */}
-               <motion.div style={{ translateY: useTransform(scrollYProgress, [0.4, 0.6], [50, -20]) }} className="absolute -right-6 top-32 bg-black/80 backdrop-blur-xl border border-[#06b6d4]/40 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                 <span className="text-xl">✂️</span> <span className="text-sm font-bold">AI Auto Assembly</span>
+               <motion.div className="absolute -right-2 md:-right-6 top-24 md:top-32 bg-black/80 backdrop-blur-xl border border-[#06b6d4]/40 text-white px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3">
+                 <span className="text-lg md:text-xl">✂️</span> <span className="text-xs md:text-sm font-bold">AI Auto Assembly</span>
                </motion.div>
             </motion.div>
 
-            {/* Card 3: Publishing Calendar UI */}
-            <motion.div style={{ y: card3Y, zIndex: 30 }} className="absolute right-[8%] bottom-[-5%] w-[45%] rounded-3xl overflow-hidden glass-panel shadow-[0_50px_100px_rgba(0,0,0,0.9)] border border-white/10">
-               <div className="p-4 bg-black/40 border-b border-white/5 flex justify-between items-center backdrop-blur-md">
-                 <span className="text-[10px] font-bold tracking-widest text-[#ec4899] uppercase">Publishing Queue</span>
+            {/* Scene 3: Publishing Calendar UI */}
+            <motion.div style={{ y: card3Y, opacity: card3Opacity, scale: card3Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden glass-panel border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.9)]">
+               <div className="p-3 md:p-4 bg-black/40 border-b border-white/5 flex justify-between items-center backdrop-blur-md">
+                 <span className="text-[10px] md:text-xs font-bold tracking-widest text-[#ec4899] uppercase">Publishing Queue</span>
                </div>
                <img src="/assets/publishing_calendar_mockup_1774778045010.png" alt="Publish UI" className="w-full object-cover" />
                
                {/* Floating Tag */}
-               <motion.div style={{ translateY: useTransform(scrollYProgress, [0.65, 0.85], [50, -20]) }} className="absolute -left-16 bottom-20 bg-black/80 backdrop-blur-xl border border-[#ec4899]/40 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                 <span className="text-xl">🚀</span> <span className="text-sm font-bold">Post Everywhere</span>
+               <motion.div className="absolute -left-2 md:-left-6 bottom-16 md:bottom-20 bg-black/80 backdrop-blur-xl border border-[#ec4899]/40 text-white px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3">
+                 <span className="text-lg md:text-xl">🚀</span> <span className="text-xs md:text-sm font-bold">Post Everywhere</span>
                </motion.div>
             </motion.div>
 
-        </motion.div>
+        </div>
       </div>
     </div>
   )
