@@ -8,7 +8,7 @@ import {
   ChevronDown, ChevronUp, Clock, RefreshCw,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { usePlanGate, UsageBar } from '@/components/ui/PlanGate'
+import { usePlanGate, UsageBar, UpgradePrompt } from '@/components/ui/PlanGate'
 import { generateIdeas, type IdeaVariant, type HookVariant } from '@/lib/api'
 import { NICHES, PLATFORMS, cn, getDifficultyColor, getFormatLabel, getNicheEmoji } from '@/lib/utils'
 import type { Niche, Platform } from '@/types'
@@ -275,7 +275,11 @@ export default function StudioPage() {
               )}
             </motion.button>
 
-            {error && (
+            {error && error.includes('Upgrade') && usage ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 mb-2">
+                <UpgradePrompt feature="idea generations" used={usage.usage.ideas.used} limit={usage.usage.ideas.limit} plan={usage.plan} />
+              </motion.div>
+            ) : error ? (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -283,7 +287,7 @@ export default function StudioPage() {
               >
                 {error}
               </motion.p>
-            )}
+            ) : null}
 
             {/* Results */}
             {ideas.length > 0 && (

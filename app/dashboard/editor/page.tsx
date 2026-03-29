@@ -645,6 +645,10 @@ export default function EditorPage() {
                 <br />720p output (upgrade Railway for 1080p).
               </p>
             </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="pt-2">
+              <AIToolsPanel projectTitle={projectTitle || (file ? file.name.replace(/\.[^.]+$/, '') : '')} />
+            </motion.div>
           </div>
         </div>
       </div>

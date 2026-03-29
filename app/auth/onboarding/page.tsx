@@ -23,7 +23,7 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false)
 
   // Form state
-  const [niche, setNiche] = useState<Niche | null>(null)
+  const [niches, setNiches] = useState<string[]>([])
   const [subNiche, setSubNiche] = useState('')
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [monetisationTarget, setMonetisationTarget] = useState<Platform>('instagram')
@@ -39,7 +39,7 @@ export default function OnboardingPage() {
   }
 
   function canAdvance() {
-    if (step === 'niche') return !!niche
+    if (step === 'niche') return niches.length > 0
     if (step === 'platforms') return platforms.length > 0
     return !!currentFollowers
   }
@@ -59,7 +59,7 @@ export default function OnboardingPage() {
 
     try {
       await updateProfile(user.id, {
-        niche,
+        niche: niches.join(','),
         sub_niche: subNiche || null,
         platforms,
         monetisation_goal: goal,
@@ -135,27 +135,30 @@ export default function OnboardingPage() {
               </p>
 
               <div className="grid grid-cols-2 gap-2 mb-5">
-                {NICHES.map((n) => (
-                  <button
-                    key={n.value}
-                    onClick={() => setNiche(n.value)}
-                    className={cn(
-                      'flex items-center gap-3 p-3.5 rounded-xl border text-sm font-medium transition-all',
-                      niche === n.value
-                        ? 'bg-accent/15 border-accent/50 text-white'
-                        : 'border-border text-slate-400 hover:border-border-2 hover:text-white hover:bg-white/5'
-                    )}
-                  >
-                    <span className="text-xl leading-none">{n.emoji}</span>
-                    <span>{n.label}</span>
-                    {niche === n.value && (
-                      <Check size={13} className="ml-auto text-accent" />
-                    )}
-                  </button>
-                ))}
+                {NICHES.map((n) => {
+                  const isSelected = niches.includes(n.value)
+                  return (
+                    <button
+                      key={n.value}
+                      onClick={() => setNiches(prev => prev.includes(n.value) ? prev.filter(x => x !== n.value) : [...prev, n.value])}
+                      className={cn(
+                        'flex items-center gap-3 p-3.5 rounded-xl border text-sm font-medium transition-all',
+                        isSelected
+                          ? 'bg-accent/15 border-accent/50 text-white'
+                          : 'border-border text-slate-400 hover:border-border-2 hover:text-white hover:bg-white/5'
+                      )}
+                    >
+                      <span className="text-xl leading-none">{n.emoji}</span>
+                      <span>{n.label}</span>
+                      {isSelected && (
+                        <Check size={13} className="ml-auto text-accent" />
+                      )}
+                    </button>
+                  )
+                })}
               </div>
 
-              {niche && niche !== 'other' && (
+              {niches.length > 0 && !niches.includes('other') && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
@@ -166,7 +169,7 @@ export default function OnboardingPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder={`e.g. ${niche === 'finance' ? 'crypto, investing' : niche === 'fitness' ? 'yoga, calisthenics' : 'more specific...'}`}
+                    placeholder={`e.g. ${niches.includes('finance') ? 'crypto, investing' : niches.includes('fitness') ? 'yoga, calisthenics' : 'more specific...'}`}
                     value={subNiche}
                     onChange={(e) => setSubNiche(e.target.value)}
                     className="input w-full"

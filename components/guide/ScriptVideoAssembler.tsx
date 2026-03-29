@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
+import { usePlanGate, UpgradePrompt } from '@/components/ui/PlanGate'
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
 
@@ -43,6 +44,7 @@ interface Props {
 }
 
 export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Props) {
+  const { usage } = usePlanGate()
   const [activeProjectId] = useState(() => projectId || crypto.randomUUID())
   const [scenes, setScenes] = useState<Record<string, SceneClip>>(() =>
     Object.fromEntries(sections.map(s => [s.section, {
@@ -93,7 +95,11 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
           project_id: activeProjectId,
         }),
       })
-      if (!urlRes.ok) throw new Error('Failed to get upload URL')
+      if (!urlRes.ok) {
+        const err = await urlRes.json().catch(() => ({}))
+        const msg = typeof err?.detail === 'object' ? err.detail.message : err?.detail
+        throw new Error(msg || 'Failed to get upload URL')
+      }
       const { upload_url, key } = await urlRes.json()
 
       // Upload with progress tracking using XMLHttpRequest
@@ -117,6 +123,7 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
 
       setScenes(prev => ({ ...prev, [sectionKey]: { ...prev[sectionKey], status: 'done', progress: 100, uploadKey: key } }))
     } catch (e: any) {
+      if (e.message) setError(e.message)
       setScenes(prev => ({ ...prev, [sectionKey]: { ...prev[sectionKey], status: 'error', progress: 0 } }))
     }
   }
@@ -239,6 +246,14 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
           Upload each script section as a separate clip. The AI combines them in order, cuts silences, burns captions, and creates a polished video.
         </p>
       </div>
+
+      {error && error.includes('Upgrade') && usage ? (
+        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
+          <UpgradePrompt feature="video uploads" used={usage.usage.uploads.used} limit={usage.usage.uploads.limit} plan={usage.plan} />
+        </motion.div>
+      ) : error ? (
+        <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">{error}</p>
+      ) : null}
 
       {/* Scene upload cards */}
       <div className="space-y-3">

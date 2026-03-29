@@ -314,7 +314,7 @@ export default function SettingsPage() {
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div>
               <p className="text-slate-500 mb-1">Niche</p>
-              <p className="text-white capitalize">{profile?.niche ?? '—'}</p>
+              <p className="text-white capitalize">{profile?.niche?.split(',').join(', ') ?? '—'}</p>
             </div>
             <div>
               <p className="text-slate-500 mb-1">Platforms</p>

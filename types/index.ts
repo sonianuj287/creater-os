@@ -3,7 +3,7 @@
 // ============================================================
 
 export type Plan = 'free' | 'creator' | 'pro' | 'agency'
-export type Niche = 'finance' | 'fitness' | 'tech' | 'lifestyle' | 'food' | 'travel' | 'education' | 'gaming' | 'beauty' | 'other'
+export type Niche = 'finance' | 'fitness' | 'tech' | 'lifestyle' | 'food' | 'travel' | 'education' | 'gaming' | 'beauty' | 'other' | string
 export type Platform = 'instagram' | 'youtube' | 'tiktok' | 'twitter' | 'linkedin'
 export type ContentFormat = 'reel' | 'short' | 'carousel' | 'long_form' | 'thread'
 export type Difficulty = 'easy' | 'medium' | 'hard'
@@ -20,7 +20,7 @@ export interface Profile {
   username: string | null
   full_name: string | null
   avatar_url: string | null
-  niche: Niche | null
+  niche: string | null
   sub_niche: string | null
   platforms: Platform[]
   content_formats: ContentFormat[]
@@ -39,7 +39,7 @@ export interface Idea {
   title: string
   description: string | null
   hook_preview: string | null
-  niche: Niche
+  niche: string
   sub_niche: string | null
   platforms: Platform[]
   recommended_format: ContentFormat | null
@@ -79,7 +79,7 @@ export interface Project {
   idea_id: string | null
   title: string
   status: ProjectStatus
-  niche: Niche | null
+  niche: string | null
   platform: Platform | null
   format: ContentFormat | null
   hook_variants: HookVariant[]
@@ -97,7 +97,7 @@ export interface Project {
 // ============================================================
 
 export interface FilterState {
-  niche: Niche | 'all'
+  niche: string | 'all'
   platform: Platform | 'all'
   format: ContentFormat | 'all'
   difficulty: Difficulty | 'all'

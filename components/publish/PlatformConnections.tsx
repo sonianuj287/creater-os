@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { CheckCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, Loader2, Sparkles, X, Activity } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
@@ -38,6 +38,10 @@ export function PlatformConnections() {
   const [loading, setLoading]     = useState(true)
   const [userId, setUserId]       = useState('')
   const searchParams              = useSearchParams()
+  
+  const [reviewLoading, setReviewLoading] = useState<string | null>(null)
+  const [reviewData, setReviewData] = useState<{ platform: string, markdown: string } | null>(null)
+
 
   useEffect(() => {
     loadConnections()
@@ -84,6 +88,39 @@ export function PlatformConnections() {
       .eq('user_id', user.id)
       .eq('platform', platformId)
     loadConnections()
+  }
+
+  async function handleAIReview(platformId: string) {
+    if (!userId) return
+    setReviewLoading(platformId)
+    setReviewData(null)
+    try {
+      const resp = await fetch(`${BACKEND}/publish/${platformId}/review?user_id=${userId}`)
+      if (!resp.ok) {
+        const err = await resp.json()
+        throw new Error(err.detail || 'Failed to generate review')
+      }
+      const data = await resp.json()
+      setReviewData({ platform: platformId, markdown: data.review })
+    } catch (e: any) {
+      alert(e.message)
+    } finally {
+      setReviewLoading(null)
+    }
+  }
+
+  function parseMarkdown(text: string) {
+    return text.split('\n').map((line, i) => {
+      line = line.trim()
+      if (!line) return null
+      if (line.startsWith('### ')) {
+        return <h3 key={i} className="text-sm font-bold text-white mt-5 mb-2 flex items-center gap-2"><Activity size={14} className="text-accent" />{line.replace('### ', '')}</h3>
+      }
+      if (line.startsWith('- ')) {
+        return <p key={i} className="text-sm text-slate-300 ml-5 mb-2 relative before:content-['•'] before:absolute before:-left-4 before:text-accent/60 leading-relaxed">{line.replace('- ', '')}</p>
+      }
+      return <p key={i} className="text-sm text-slate-400 mb-3 leading-relaxed">{line}</p>
+    })
   }
 
   if (loading) {
@@ -137,6 +174,17 @@ export function PlatformConnections() {
               {isConnected ? (
                 <>
                   <CheckCircle size={14} className="text-emerald-400" />
+                  
+                  <button 
+                    onClick={() => handleAIReview(platform.id)} 
+                    disabled={reviewLoading === platform.id}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-accent bg-accent/10 hover:bg-accent/20 border border-accent/20 px-3 py-1.5 rounded-lg transition-all"
+                  >
+                    {reviewLoading === platform.id ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                    {reviewLoading === platform.id ? 'Analyzing...' : 'AI Review'}
+                  </button>
+                  
+                  <div className="w-px h-4 bg-border mx-1" />
                   <button onClick={() => handleDisconnect(platform.id)} className="text-xs text-slate-500 hover:text-rose-400 transition-colors">
                     Disconnect
                   </button>
@@ -159,6 +207,37 @@ export function PlatformConnections() {
           </motion.div>
         )
       })}
+
+      {/* AI Review Modal Overlay */}
+      {reviewData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#0f1115] border border-border w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+          >
+            <div className="flex items-center justify-between p-5 border-b border-white/5 bg-white/[0.02]">
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-accent" />
+                <h2 className="text-sm font-bold text-white capitalize">{reviewData.platform} Profile Audit</h2>
+              </div>
+              <button onClick={() => setReviewData(null)} className="text-slate-500 hover:text-white transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              {parseMarkdown(reviewData.markdown)}
+            </div>
+            
+            <div className="p-4 border-t border-white/5 bg-white/[0.01]">
+              <button onClick={() => setReviewData(null)} className="w-full btn-solid py-2 text-xs font-semibold tracking-wider">
+                Got it
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }

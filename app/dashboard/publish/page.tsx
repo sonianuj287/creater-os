@@ -11,6 +11,7 @@ import {
 import { createClient } from '@/lib/supabase'
 import { CaptionGenerator } from '@/components/publish/CaptionGenerator'
 import { Scheduler } from '@/components/publish/Scheduler'
+import { PlanGate, usePlanGate } from '@/components/ui/PlanGate'
 
 import { PostToInstagram } from '@/components/publish/PostToInstagram'
 import { cn, formatNumber } from '@/lib/utils'
@@ -35,6 +36,7 @@ function PlatformBadge({ platform }: { platform: string }) {
 }
 
 export default function PublishPage() {
+  const { usage } = usePlanGate()
   const [projects, setProjects]         = useState<any[]>([])
   const [selected, setSelected]         = useState<any>(null)
   const [output, setOutput]             = useState<any>(null)
@@ -298,13 +300,15 @@ export default function PublishPage() {
                         <Calendar size={14} className="text-accent" /> Schedule for later
                       </p>
                       <p className="text-xs text-slate-500 mb-4">Pick a peak hour to automate posting.</p>
-                      <Scheduler
-                        projectId={selected.id}
-                        outputId={output.id}
-                        platform="instagram"
-                        caption={caption}
-                        hashtags=""
-                      />
+                      <PlanGate feature="automated scheduling" used={1} limit={1} plan={usage?.plan ?? 'free'} locked={usage?.plan === 'free'}>
+                        <Scheduler
+                          projectId={selected.id}
+                          outputId={output.id}
+                          platform="instagram"
+                          caption={caption}
+                          hashtags=""
+                        />
+                      </PlanGate>
                       <div className="mt-5 pt-5 border-t border-border">
                         <ScheduledPostsList userId={userId} />
                       </div>
