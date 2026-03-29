@@ -145,9 +145,15 @@ function GuidePage() {
 
   useEffect(() => {
     const t = searchParams.get('title')
+    const d = searchParams.get('description')
+    const h = searchParams.get('hook')
     const n = searchParams.get('niche')
+    const f = searchParams.get('format')
     if (t) setTitle(decodeURIComponent(t))
+    if (d) setDescription(decodeURIComponent(d))
+    if (h) setHook(decodeURIComponent(h))
     if (n) setNiche(n as any)
+    if (f) setFormat(f as any)
   }, [])
 
   async function handleGenerateScript() {

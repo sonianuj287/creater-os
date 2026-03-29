@@ -47,6 +47,7 @@ export interface IdeaVariant {
   recommended_format: string
   estimated_minutes: number
   difficulty: string
+  niche?: string
 }
 
 export async function generateIdeas(req: IdeaGenerateRequest) {

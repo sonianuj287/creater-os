@@ -12,6 +12,7 @@ import { usePlanGate, UsageBar, UpgradePrompt } from '@/components/ui/PlanGate'
 import { generateIdeas, type IdeaVariant, type HookVariant } from '@/lib/api'
 import { NICHES, PLATFORMS, cn, getDifficultyColor, getFormatLabel, getNicheEmoji } from '@/lib/utils'
 import type { Niche, Platform } from '@/types'
+import { LottiePlayer } from '@/components/ui/LottiePlayer'
 
 const EXAMPLE_PROMPTS = [
   "How I saved money on a low salary",
@@ -22,21 +23,21 @@ const EXAMPLE_PROMPTS = [
 ]
 
 const HOOK_STYLE_LABELS: Record<string, string> = {
-  question:   "Question",
+  question: "Question",
   shock_stat: "Shock stat",
-  story:      "Story",
+  story: "Story",
   bold_claim: "Bold claim",
 }
 
 const HOOK_STYLE_COLORS: Record<string, string> = {
-  question:   "bg-purple-500/15 text-purple-300 border-purple-500/30",
+  question: "bg-purple-500/15 text-purple-300 border-purple-500/30",
   shock_stat: "bg-red-500/15 text-red-300 border-red-500/30",
-  story:      "bg-amber-500/15 text-amber-300 border-amber-500/30",
+  story: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   bold_claim: "bg-teal-500/15 text-teal-300 border-teal-500/30",
 }
 
-function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
-  const router = useRouter()   // ← add this line
+function IdeaResultCard({ idea, index, niche }: { idea: IdeaVariant; index: number; niche: string }) {
+  const router = useRouter()
   const [expanded, setExpanded] = useState(index === 0)
   const [selectedHook, setSelectedHook] = useState(0)
 
@@ -137,7 +138,12 @@ function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
                   Best format: {getFormatLabel(idea.recommended_format as any)}
                 </span>
                 <button
-                  onClick={() => router.push(`/dashboard/guide?title=${encodeURIComponent(idea.title)}`)}
+                  onClick={() => {
+                    const hookText = idea.hooks[selectedHook]?.text ?? ''
+                    router.push(
+                      `/dashboard/guide?title=${encodeURIComponent(idea.title)}&description=${encodeURIComponent(idea.description)}&hook=${encodeURIComponent(hookText)}&niche=${encodeURIComponent(idea.niche ?? niche)}&format=${encodeURIComponent(idea.recommended_format ?? '')}`
+                    )
+                  }}
                   className="btn-primary text-xs flex items-center gap-1.5 py-2"
                 >
                   Use this idea
@@ -155,12 +161,12 @@ function IdeaResultCard({ idea, index }: { idea: IdeaVariant; index: number }) {
 export default function StudioPage() {
   const router = useRouter()
   const { usage, canGenerate, userId } = usePlanGate()
-  const [prompt, setPrompt]         = useState('')
-  const [niche, setNiche]           = useState<Niche>('finance')
-  const [platforms, setPlatforms]   = useState<Platform[]>(['instagram', 'youtube'])
-  const [loading, setLoading]       = useState(false)
-  const [ideas, setIdeas]           = useState<IdeaVariant[]>([])
-  const [error, setError]           = useState('')
+  const [prompt, setPrompt] = useState('')
+  const [niche, setNiche] = useState<Niche>('finance')
+  const [platforms, setPlatforms] = useState<Platform[]>(['instagram', 'youtube'])
+  const [loading, setLoading] = useState(false)
+  const [ideas, setIdeas] = useState<IdeaVariant[]>([])
+  const [error, setError] = useState('')
 
   function togglePlatform(p: Platform) {
     setPlatforms(prev =>
@@ -265,7 +271,7 @@ export default function StudioPage() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Gemini is generating your ideas...
+                  AI is generating your ideas...
                 </>
               ) : (
                 <>
@@ -309,7 +315,7 @@ export default function StudioPage() {
                   </button>
                 </div>
                 {ideas.map((idea, i) => (
-                  <IdeaResultCard key={i} idea={idea} index={i} />
+                  <IdeaResultCard key={i} idea={idea} index={i} niche={niche} />
                 ))}
               </motion.div>
             )}
@@ -320,10 +326,11 @@ export default function StudioPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-center py-16 text-slate-600"
+                className="flex flex-col items-center justify-center py-16 text-slate-600"
               >
-                <Sparkles size={28} className="mx-auto mb-3 opacity-30" />
-                <p className="text-sm">Your ideas will appear here</p>
+                <LottiePlayer preset="idea-sparkle" size={100} className="mb-4 opacity-70" />
+                <p className="text-sm font-medium text-slate-500">Your ideas will appear here</p>
+                <p className="text-xs text-slate-600 mt-1">Enter a topic above and generate your first set of hooks</p>
               </motion.div>
             )}
           </div>

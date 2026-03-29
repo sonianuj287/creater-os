@@ -13,6 +13,8 @@ import { createClient } from '@/lib/supabase'
 import type { FilterState, Idea, MonetisationGoal } from '@/types'
 import { cn, getNicheEmoji } from '@/lib/utils'
 import { OnboardingTour, useTour } from '@/components/ui/OnboardingTour'
+import { HeroCarousel } from '@/components/feed/HeroCarousel'
+import { LottiePlayer } from '@/components/ui/LottiePlayer'
 
 const DEFAULT_FILTERS: FilterState = {
   niche: 'all', platform: 'all', format: 'all', difficulty: 'all',
@@ -145,7 +147,15 @@ export default function DashboardPage() {
           </motion.button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+        {/* 3D HERO CAROUSEL */}
+        {!loading && filteredIdeas.length > 0 && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
+            <HeroCarousel ideas={filteredIdeas.slice(0, Math.min(5, filteredIdeas.length))} />
+          </motion.div>
+        )}
+
+        {/* Main Feed + Sidebar Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 lg:mt-8">
           {/* Feed */}
           <div className="space-y-5">
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="relative">
@@ -201,9 +211,9 @@ export default function DashboardPage() {
             )}
 
             {loading ? (
-              <div className="flex items-center justify-center py-20 text-slate-600">
-                <Loader2 size={20} className="animate-spin mr-2" />
-                <span className="text-sm">Fetching trending ideas...</span>
+              <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+                <LottiePlayer preset="loading-ai" size={100} className="mb-3" />
+                <span className="text-sm text-slate-500 font-medium">Fetching trending ideas...</span>
               </div>
             ) : filteredIdeas.length === 0 ? (
               <div className="text-center py-20">
@@ -213,10 +223,24 @@ export default function DashboardPage() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredIdeas.map((idea, i) => (
-                  <IdeaCard key={idea.id ?? i} idea={idea} index={i} />
-                ))}
+              <div className="mt-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-px bg-white/10 flex-grow" />
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest text-shadow-sm">The Idea Stream</span>
+                  <div className="h-px bg-white/10 flex-grow" />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 auto-rows-max">
+                  {filteredIdeas.slice(Math.min(5, filteredIdeas.length)).map((idea, i) => {
+                    // Bento Asymmetry pattern calculation
+                    const mod = i % 5
+                    let size: 'standard' | 'wide' | 'tall' | 'featured' = 'standard'
+                    if (mod === 0) size = 'wide'         // Stretch across both columns
+                    if (mod === 3) size = 'featured'     // Massive 2x2 focus block
+                    
+                    return <IdeaCard key={idea.id ?? i} idea={idea} index={i} size={size} />
+                  })}
+                </div>
               </div>
             )}
           </div>
