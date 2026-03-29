@@ -261,6 +261,10 @@ export default function PublishPage() {
                       description={selected.title}
                       niche={selected.niche ?? 'lifestyle'}
                       hook={output.clips?.[0]?.hook}
+                      onApply={(text) => {
+                        setCaption(text)
+                        setTab('post')
+                      }}
                     />
                   </div>
                 )}

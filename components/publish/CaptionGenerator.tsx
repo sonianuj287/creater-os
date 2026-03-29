@@ -25,9 +25,10 @@ interface CaptionGeneratorProps {
   description: string
   niche: string
   hook?: string
+  onApply?: (caption: string) => void
 }
 
-export function CaptionGenerator({ title, description, niche, hook }: CaptionGeneratorProps) {
+export function CaptionGenerator({ title, description, niche, hook, onApply }: CaptionGeneratorProps) {
   const [platform, setPlatform]   = useState('instagram')
   const [loading, setLoading]     = useState(false)
   const [result, setResult]       = useState<any>(null)
@@ -43,7 +44,14 @@ export function CaptionGenerator({ title, description, niche, hook }: CaptionGen
       const data = await generateCaptions({ title, description, platform, niche, hook })
       setResult(data)
       setSelected(0)
-      setEditedCaption(data.variants[0]?.caption ?? '')
+      
+      const hashtagsStr = [
+        ...(data.hashtags?.big   ?? []),
+        ...(data.hashtags?.niche ?? []),
+        ...(data.hashtags?.micro ?? []),
+      ].map((h: string) => `#${h.replace(/^#/, '')}`).join(' ')
+      
+      setEditedCaption(`${data.variants[0]?.caption ?? ''}\n\n${hashtagsStr}`.trim())
     } catch (e: any) {
       console.error(e)
     } finally {
@@ -59,7 +67,12 @@ export function CaptionGenerator({ title, description, niche, hook }: CaptionGen
 
   function selectVariant(i: number) {
     setSelected(i)
-    setEditedCaption(result.variants[i]?.caption ?? '')
+    const hashtagsStr = [
+      ...(result.hashtags?.big   ?? []),
+      ...(result.hashtags?.niche ?? []),
+      ...(result.hashtags?.micro ?? []),
+    ].map((h: string) => `#${h.replace(/^#/, '')}`).join(' ')
+    setEditedCaption(`${result.variants[i]?.caption ?? ''}\n\n${hashtagsStr}`.trim())
   }
 
   const allHashtags = result
@@ -164,6 +177,15 @@ export function CaptionGenerator({ title, description, niche, hook }: CaptionGen
                 rows={6}
                 className="input w-full resize-none text-sm leading-relaxed"
               />
+              {onApply && (
+                <button
+                  onClick={() => onApply(editedCaption)}
+                  className="w-full mt-3 btn-primary py-2.5 text-sm font-semibold flex items-center justify-center gap-2"
+                >
+                  <CheckCheck size={16} />
+                  Apply to Post
+                </button>
+              )}
             </div>
 
             {/* Posting time */}
