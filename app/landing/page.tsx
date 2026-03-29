@@ -48,7 +48,7 @@ function AnimatedHeroLogo() {
   }, [])
 
   return (
-    <div className="relative flex items-center justify-center font-black text-[clamp(3.5rem,8vw,7rem)] tracking-tight leading-none h-[140px] mb-8 overflow-hidden pt-2">
+    <div className="relative flex items-center justify-center font-black text-[clamp(3.5rem,8vw,7rem)] tracking-tight leading-none h-[180px] mt-4 mb-4 overflow-hidden pt-6">
        
        {/* 'create' */}
        <motion.span
@@ -59,7 +59,7 @@ function AnimatedHeroLogo() {
            filter: phase >= 2 ? 'blur(0px)' : 'blur(20px)' 
          }}
          transition={{ type: 'spring', damping: 15, stiffness: 100, mass: 1 }}
-         className="absolute right-[50%] mr-[1.1em] xl:mr-[1.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#ff4d4d] to-[#f97316] pb-2"
+         className="absolute right-[50%] mr-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#ff4d4d] to-[#f97316] pb-2"
        >
          create
        </motion.span>
@@ -67,9 +67,9 @@ function AnimatedHeroLogo() {
        {/* 'r' / 'relax' pivot */}
        <div className="absolute left-[50%] -translate-x-1/2 flex items-baseline pb-2">
          <motion.span
-           initial={{ y: -80, scale: 1.2 }}
+           initial={{ y: -50, scale: 1.2 }}
            animate={{
-             y: phase >= 2 ? 0 : phase === 1 ? -40 : -80,
+             y: phase >= 2 ? 0 : phase === 1 ? -20 : -50,
              scale: phase >= 2 ? 1 : 1.2,
              color: phase >= 2 ? 'transparent' : '#fff',
              backgroundImage: phase >= 2 ? 'linear-gradient(135deg, #f97316, #7c6af5)' : 'none',
@@ -87,7 +87,7 @@ function AnimatedHeroLogo() {
                initial={{ opacity: 1 }}
                exit={{ opacity: 0, scale: 0.5, x: 40, y: -20, filter: 'blur(10px)' }}
                transition={{ duration: 0.6, ease: "easeIn" }}
-               className="text-white relative -top-[80px] scale-[1.2] origin-left"
+               className="text-white relative -top-[50px] scale-[1.2] origin-left"
              >
                elax
              </motion.span>
@@ -104,7 +104,7 @@ function AnimatedHeroLogo() {
            filter: phase >= 2 ? 'blur(0px)' : 'blur(20px)' 
          }}
          transition={{ type: 'spring', damping: 15, stiffness: 100, mass: 1 }}
-         className="absolute left-[50%] ml-[1.15em] xl:ml-[1.25em] bg-clip-text text-transparent bg-gradient-to-r from-[#7c6af5] to-[#06b6d4] pb-2"
+         className="absolute left-[50%] ml-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#7c6af5] to-[#06b6d4] pb-2"
        >
          os
        </motion.span>
