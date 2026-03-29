@@ -144,15 +144,15 @@ function ScrollShowcase() {
   const perspectiveY = useTransform(scrollYProgress, [0, 1], [20, -10])
   
   // Big floating text scale and fade
-  const textScale = useTransform(scrollYProgress, [0.05, 0.25], [1, 7])
-  const textOpacity = useTransform(scrollYProgress, [0.05, 0.22], [1, 0])
+  const textScale = useTransform(scrollYProgress, [0, 0.15], [1, 7])
+  const textOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0])
 
   // Sequential UI Card Entrances
-  const card1Y = useTransform(scrollYProgress, [0.15, 0.3], [800, 0])
-  const card1Rot = useTransform(scrollYProgress, [0.15, 0.4], [15, 0])
+  const card1Y = useTransform(scrollYProgress, [0.05, 0.25], [800, 0])
+  const card1Rot = useTransform(scrollYProgress, [0.05, 0.3], [15, 0])
   
-  const card2Y = useTransform(scrollYProgress, [0.4, 0.6], [800, 0])
-  const card2Rot = useTransform(scrollYProgress, [0.4, 0.6], [15, 0])
+  const card2Y = useTransform(scrollYProgress, [0.35, 0.55], [800, 0])
+  const card2Rot = useTransform(scrollYProgress, [0.35, 0.6], [15, 0])
   
   const card3Y = useTransform(scrollYProgress, [0.65, 0.85], [1000, 0])
   
