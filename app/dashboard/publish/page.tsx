@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  SendHorizonal, Film, Download, Layers, Scissors,
+  SendHorizonal, Film, Download, Layers, FileText, Scissors,
   Image, Twitter, Mail, Loader2, AlertCircle,
   Calendar, CheckCircle, Clock, ArrowRight, Sparkles,
   Instagram, Youtube, Share2,
@@ -11,13 +11,13 @@ import {
 import { createClient } from '@/lib/supabase'
 import { CaptionGenerator } from '@/components/publish/CaptionGenerator'
 import { Scheduler } from '@/components/publish/Scheduler'
-import { PlatformConnections } from '@/components/publish/PlatformConnections'
+
 import { PostToInstagram } from '@/components/publish/PostToInstagram'
 import { cn, formatNumber } from '@/lib/utils'
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
 
-type Tab = 'post' | 'captions' | 'schedule' | 'downloads' | 'connections'
+type Tab = 'preview' | 'captions' | 'publish'
 
 const FORMAT_LABELS: Record<string, { label: string; desc: string }> = {
   '9x16': { label: '9:16 Vertical', desc: 'Reels · Shorts · TikTok' },
@@ -40,7 +40,7 @@ export default function PublishPage() {
   const [output, setOutput]             = useState<any>(null)
   const [loadingProjects, setLoadingProjects] = useState(true)
   const [loadingOutput, setLoadingOutput]     = useState(false)
-  const [tab, setTab]                   = useState<Tab>('post')
+  const [tab, setTab]                   = useState<Tab>('preview')
   const [userId, setUserId]             = useState('')
   const [caption, setCaption]           = useState('')
   const [postedPlatforms, setPostedPlatforms] = useState<string[]>([])
@@ -84,11 +84,9 @@ export default function PublishPage() {
   }
 
   const TABS: Array<{ id: Tab; label: string; icon: any }> = [
-    { id: 'post',        label: 'Post now',   icon: SendHorizonal },
-    { id: 'captions',    label: 'Captions',   icon: Sparkles },
-    { id: 'schedule',    label: 'Schedule',   icon: Calendar },
-    { id: 'downloads',   label: 'Downloads',  icon: Download },
-    { id: 'connections', label: 'Accounts',   icon: Layers },
+    { id: 'preview',   label: '1. Preview',   icon: Film },
+    { id: 'captions',  label: '2. Captions',  icon: Sparkles },
+    { id: 'publish',   label: '3. Publish',   icon: SendHorizonal },
   ]
 
   return (
@@ -182,23 +180,79 @@ export default function PublishPage() {
                   })}
                 </div>
 
-                {/* POST NOW tab */}
-                {tab === 'post' && (
+                {/* PREVIEW tab */}
+                {tab === 'preview' && (
                   <div className="space-y-4">
-                    {/* Caption editor */}
+                    <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-4">
+                      {/* Video Player */}
+                      <div className="bg-surface border border-border rounded-2xl overflow-hidden aspect-[9/16] relative flex items-center justify-center bg-black/50">
+                        {output.format_urls?.['9x16'] ? (
+                          <video 
+                            src={output.format_urls['9x16']} 
+                            controls 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <p className="text-xs text-slate-500">Video not ready</p>
+                        )}
+                      </div>
+                      
+                      {/* Script Context */}
+                      <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col max-h-[426px]">
+                        <p className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+                          <FileText size={14} className="text-accent" /> Script & Context
+                        </p>
+                        <p className="text-xs text-slate-500 mb-4">Review the script to ensure everything matches your generated video before posting.</p>
+                        
+                        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar border border-white/5 rounded-lg p-3 bg-white/[0.02]">
+                          <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                            {selected.script || selected.transcript || "No script available for this project."}
+                          </p>
+                        </div>
+                        
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <a href={selected.status === 'editing' ? "/dashboard/assemble" : "/dashboard/editor"} className="w-full btn-outline flex items-center justify-center gap-2 py-2 text-xs font-semibold">
+                            <Scissors size={14} /> Edit & Re-upload
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* CAPTIONS tab */}
+                {tab === 'captions' && (
+                  <div className="bg-surface border border-border rounded-2xl p-5 border-l-2 border-l-accent">
+                    <p className="text-sm font-semibold text-white mb-1">Generate captions</p>
+                    <p className="text-xs text-slate-500 mb-4">Generate 3 caption styles with hashtags using AI.</p>
+                    <CaptionGenerator
+                      title={selected.title}
+                      description={selected.title}
+                      niche={selected.niche ?? 'lifestyle'}
+                      hook={output.clips?.[0]?.hook}
+                      onApply={(text) => {
+                        setCaption(text)
+                        setTab('publish')
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* PUBLISH tab */}
+                {tab === 'publish' && (
+                  <div className="space-y-5">
+                    
+                    {/* Caption Review */}
                     <div className="bg-surface border border-border rounded-2xl p-5">
-                      <p className="text-sm font-semibold text-white mb-3">Your caption</p>
+                      <p className="text-sm font-semibold text-white mb-3">Your final caption</p>
                       <textarea
                         value={caption} onChange={e => setCaption(e.target.value)}
-                        rows={4} placeholder="Write your caption here, or generate one in the Captions tab..."
+                        rows={4} placeholder="Write your caption here..."
                         className="input w-full resize-none text-sm leading-relaxed mb-2"
                       />
-                      <button onClick={() => setTab('captions')} className="text-xs text-accent hover:underline">
-                        Generate AI caption →
-                      </button>
                     </div>
 
-                    {/* Platform post buttons */}
+                    {/* Instant Post Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Instagram */}
                       <div className="bg-surface border border-border rounded-2xl p-5">
@@ -206,7 +260,7 @@ export default function PublishPage() {
                           <div className="w-8 h-8 bg-pink-500/20 rounded-lg flex items-center justify-center text-xs font-bold text-pink-300 border border-pink-500/30">IG</div>
                           <div>
                             <p className="text-sm font-semibold text-white">Instagram Reel</p>
-                            <p className="text-xs text-slate-500">9:16 vertical format</p>
+                            <p className="text-xs text-slate-500">Post now directly</p>
                           </div>
                         </div>
                         <PostToInstagram
@@ -223,7 +277,7 @@ export default function PublishPage() {
                           <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center text-xs font-bold text-red-300 border border-red-500/30">YT</div>
                           <div>
                             <p className="text-sm font-semibold text-white">YouTube Short</p>
-                            <p className="text-xs text-slate-500">9:16 vertical format</p>
+                            <p className="text-xs text-slate-500">Post now directly</p>
                           </div>
                         </div>
                         <YouTubePostButton
@@ -238,43 +292,12 @@ export default function PublishPage() {
                       </div>
                     </div>
 
-                    {/* One-click all platforms */}
-                    {output.format_urls?.['9x16'] && caption && (
-                      <div className="bg-gradient-to-r from-pink-500/10 to-red-500/10 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-white mb-0.5">Post to all platforms</p>
-                          <p className="text-xs text-slate-400">Instagram + YouTube at the same time</p>
-                        </div>
-                        <span className="text-xs text-slate-500 bg-white/5 px-3 py-1.5 rounded-lg border border-border">Coming soon</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* CAPTIONS tab */}
-                {tab === 'captions' && (
-                  <div className="bg-surface border border-border rounded-2xl p-5">
-                    <p className="text-sm font-semibold text-white mb-1">Generate captions</p>
-                    <p className="text-xs text-slate-500 mb-4">Pick your platform and get 3 caption styles with hashtags.</p>
-                    <CaptionGenerator
-                      title={selected.title}
-                      description={selected.title}
-                      niche={selected.niche ?? 'lifestyle'}
-                      hook={output.clips?.[0]?.hook}
-                      onApply={(text) => {
-                        setCaption(text)
-                        setTab('post')
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* SCHEDULE tab */}
-                {tab === 'schedule' && (
-                  <div className="space-y-4">
+                    {/* Schedule */}
                     <div className="bg-surface border border-border rounded-2xl p-5">
-                      <p className="text-sm font-semibold text-white mb-1">Schedule for later</p>
-                      <p className="text-xs text-slate-500 mb-4">Pick a date and time — we'll remind you to post.</p>
+                      <p className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
+                        <Calendar size={14} className="text-accent" /> Schedule for later
+                      </p>
+                      <p className="text-xs text-slate-500 mb-4">Pick a peak hour to automate posting.</p>
                       <Scheduler
                         projectId={selected.id}
                         outputId={output.id}
@@ -282,88 +305,32 @@ export default function PublishPage() {
                         caption={caption}
                         hashtags=""
                       />
+                      <div className="mt-5 pt-5 border-t border-border">
+                        <ScheduledPostsList userId={userId} />
+                      </div>
                     </div>
 
-                    {/* Scheduled posts list */}
-                    <ScheduledPostsList userId={userId} />
-                  </div>
-                )}
-
-                {/* DOWNLOADS tab */}
-                {tab === 'downloads' && (
-                  <div className="space-y-4">
+                    {/* Downloads Section (Collapsed style) */}
                     {output.format_urls && Object.keys(output.format_urls).length > 0 && (
-                      <div>
-                        <p className="section-label mb-3">Exported formats</p>
-                        <div className="space-y-2.5">
-                          {Object.entries(output.format_urls as Record<string, string>).map(([fmt, url]) => (
-                            <div key={fmt} className="flex items-center justify-between p-4 bg-surface border border-border rounded-xl">
-                              <div>
-                                <p className="text-sm font-medium text-white">{FORMAT_LABELS[fmt]?.label ?? fmt}</p>
-                                <p className="text-xs text-slate-500">{FORMAT_LABELS[fmt]?.desc}</p>
-                              </div>
-                              <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 btn-outline text-xs py-1.5 px-3">
-                                <Download size={12} />Download
-                              </a>
-                            </div>
-                          ))}
+                      <div className="bg-surface border border-border rounded-2xl p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Download size={14} className="text-slate-400" />
+                          <p className="text-sm font-semibold text-white">Raw Downloads</p>
                         </div>
-                      </div>
-                    )}
-
-                    {output.clips?.length > 0 && (
-                      <div>
-                        <p className="section-label mb-3">Short clips ({output.clips.length})</p>
-                        <div className="space-y-2.5">
-                          {output.clips.map((clip: any, i: number) => (
-                            <div key={i} className="p-4 bg-surface border border-border rounded-xl">
-                              <div className="flex items-start justify-between gap-3 mb-1.5">
-                                <p className="text-sm font-medium text-white">{clip.title}</p>
-                                <span className={cn('text-xs font-semibold', clip.engagement_score >= 80 ? 'text-emerald-400' : 'text-amber-400')}>{clip.engagement_score}</span>
-                              </div>
-                              <p className="text-xs text-slate-400 italic mb-3">"{clip.hook}"</p>
-                              <div className="flex justify-between items-center">
-                                <span className="text-xs text-slate-600">{clip.start_seconds?.toFixed(0)}s – {clip.end_seconds?.toFixed(0)}s</span>
-                                <a href={clip.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-accent font-medium">
-                                  <Download size={11} />Download
-                                </a>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {output.tweet_thread?.length > 0 && (
-                      <div>
-                        <p className="section-label mb-3">Tweet thread</p>
                         <div className="space-y-2">
-                          {output.tweet_thread.map((tweet: string, i: number) => (
-                            <div key={i} className="p-3.5 bg-surface border border-border rounded-xl">
-                              <div className="flex items-start gap-2.5">
-                                <span className="text-[10px] font-bold text-slate-600 bg-white/5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">{i+1}</span>
-                                <p className="text-sm text-slate-300 leading-relaxed">{tweet}</p>
-                              </div>
-                              <div className="flex justify-between mt-2">
-                                <span className={cn('text-[10px]', tweet.length > 260 ? 'text-rose-400' : 'text-slate-600')}>{tweet.length}/280</span>
-                                <button onClick={() => navigator.clipboard.writeText(tweet)} className="text-[10px] text-slate-600 hover:text-accent">Copy</button>
-                              </div>
+                          {Object.entries(output.format_urls as Record<string, string>).map(([fmt, url]) => (
+                            <div key={fmt} className="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl">
+                              <p className="text-xs font-medium text-white">{fmt === '9x16' ? 'Vertical (1080x1920)' : fmt === '16x9' ? 'Horizontal' : 'Square'}</p>
+                              <a href={url} target="_blank" rel="noopener noreferrer" className="btn-outline text-xs py-1 px-3">Download</a>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
+                    
                   </div>
                 )}
 
-                {/* CONNECTIONS tab */}
-                {tab === 'connections' && (
-                  <div className="bg-surface border border-border rounded-2xl p-5">
-                    <p className="text-sm font-semibold text-white mb-1">Connected accounts</p>
-                    <p className="text-xs text-slate-500 mb-4 leading-relaxed">Connect your accounts to post and pull analytics automatically.</p>
-                    <PlatformConnections />
-                  </div>
-                )}
               </motion.div>
             )}
           </div>

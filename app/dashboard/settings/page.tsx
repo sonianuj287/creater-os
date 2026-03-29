@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Settings, Zap, CheckCircle, Loader2, ExternalLink, Gift } from 'lucide-react'
+import { Settings, Zap, CheckCircle, Loader2, ExternalLink, Gift, Layers } from 'lucide-react'
 import { GiftCardInput } from '@/components/ui/GiftCard'
+import { PlatformConnections } from '@/components/publish/PlatformConnections'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
@@ -285,6 +286,21 @@ export default function SettingsPage() {
           <GiftCardInput onSuccess={(plan) => {
             window.location.reload()
           }} />
+        </motion.div>
+
+        {/* Connected Accounts */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.28 }}
+          className="mt-8 bg-surface border border-border rounded-2xl p-5"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Layers size={14} className="text-accent" />
+            <p className="text-sm font-semibold text-white">Connected accounts</p>
+          </div>
+          <p className="text-xs text-slate-500 mb-5 leading-relaxed">Connect your YouTube and Instagram accounts to post directly from the dashboard and pull analytics.</p>
+          <PlatformConnections />
         </motion.div>
 
         {/* Profile settings */}
