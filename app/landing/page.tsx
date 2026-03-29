@@ -48,7 +48,7 @@ function AnimatedHeroLogo() {
   }, [])
 
   return (
-    <div className="relative flex items-center justify-center font-black text-[clamp(3.5rem,8vw,7rem)] tracking-tight leading-none h-[180px] mt-4 mb-4 overflow-hidden pt-6">
+    <div className="relative flex items-center justify-center font-black text-[clamp(3.5rem,8vw,7rem)] tracking-tight leading-none h-[180px] mt-4 mb-4 pt-6">
        
        {/* 'create' */}
        <motion.span
@@ -65,7 +65,7 @@ function AnimatedHeroLogo() {
        </motion.span>
        
        {/* 'r' / 'relax' pivot */}
-       <div className="absolute left-[50%] -translate-x-1/2 flex items-baseline pb-2">
+       <div className="absolute left-[50%] -translate-x-1/2 flex pb-2">
          <motion.span
            initial={{ y: -50, scale: 1.2 }}
            animate={{
@@ -76,18 +76,17 @@ function AnimatedHeroLogo() {
              WebkitBackgroundClip: phase >= 2 ? 'text' : undefined,
            }}
            transition={{ type: 'spring', bounce: 0.35, duration: 1 }}
-           className="relative z-10 uppercase"
-           style={{ textTransform: phase >= 1 ? 'lowercase' : 'capitalize' } as any}
+           className="relative z-10"
          >
            r
          </motion.span>
          <AnimatePresence>
            {phase === 0 && (
              <motion.span
-               initial={{ opacity: 1 }}
+               initial={{ opacity: 1, y: -50, scale: 1.2 }}
                exit={{ opacity: 0, scale: 0.5, x: 40, y: -20, filter: 'blur(10px)' }}
                transition={{ duration: 0.6, ease: "easeIn" }}
-               className="text-white relative -top-[50px] scale-[1.2] origin-left"
+               className="text-white absolute left-[100%] top-0 origin-left pl-1"
              >
                elax
              </motion.span>
