@@ -43,6 +43,7 @@ interface Props {
 }
 
 export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Props) {
+  const [activeProjectId] = useState(() => projectId || crypto.randomUUID())
   const [scenes, setScenes] = useState<Record<string, SceneClip>>(() =>
     Object.fromEntries(sections.map(s => [s.section, {
       sectionKey: s.section, file: null, uploadKey: null,
@@ -89,7 +90,7 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
           filename: `${sectionKey}_${file.name}`,
           content_type: file.type,
           user_id: user.id,
-          project_id: projectId ?? 'assembler',
+          project_id: activeProjectId,
         }),
       })
       if (!urlRes.ok) throw new Error('Failed to get upload URL')
@@ -148,7 +149,7 @@ export function ScriptVideoAssembler({ sections, projectTitle, projectId }: Prop
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id:      user.id,
-          project_id:   projectId ?? `assembler_${Date.now()}`,
+          project_id:   activeProjectId,
           title:        projectTitle,
           scene_keys:   orderedKeys,
           options: {
