@@ -6,24 +6,136 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Sparkles, Lightbulb, Film, SendHorizonal,
   BarChart3, Settings, LogOut, Zap, FileText,
-  Crown, X, Check, ChevronUp, Flame,
+  Crown, X, Check, ChevronUp, Flame, TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GiftCardInput } from '@/components/ui/GiftCard'
 import { signOut, createClient } from '@/lib/supabase'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { getMySprint, cancelSprint, type SprintData } from '@/lib/api'
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
 
 const NAV_ITEMS = [
-  { label: 'Feed',      href: '/dashboard',             icon: Sparkles },
-  { label: 'Ideas',     href: '/dashboard/studio',      icon: Lightbulb },
-  { label: 'Guide',     href: '/dashboard/guide',       icon: FileText },
-  { label: 'Sprint',    href: '/dashboard/sprint',      icon: Flame,  badge: '🔥' },
-  { label: 'Editor',    href: '/dashboard/editor',      icon: Film },
-  { label: 'Publish',   href: '/dashboard/publish',     icon: SendHorizonal },
-  { label: 'Analytics', href: '/dashboard/analytics',   icon: BarChart3 },
+  { label: 'Feed',      href: '/dashboard',            icon: Sparkles },
+  { label: 'Ideas',     href: '/dashboard/studio',     icon: Lightbulb },
+  { label: 'Guide',     href: '/dashboard/guide',      icon: FileText },
+  { label: 'Editor',    href: '/dashboard/editor',     icon: Film },
+  { label: 'Publish',   href: '/dashboard/publish',    icon: SendHorizonal },
+  { label: 'Analytics', href: '/dashboard/analytics',  icon: BarChart3 },
 ]
+
+// ── Sprint Status Indicator (above Settings, only when enrolled) ──
+function SprintStatusIndicator({ userId }: { userId: string }) {
+  const router = useRouter()
+  const [sprint, setSprint]     = useState<SprintData | null>(null)
+  const [hovered, setHovered]   = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+
+  useEffect(() => {
+    if (!userId) return
+    getMySprint(userId).then(r => setSprint(r.sprint)).catch(() => {})
+  }, [userId])
+
+  if (!sprint) return null
+
+  const radius = 14
+  const circ   = 2 * Math.PI * radius
+  const pct    = sprint.completion_pct / 100
+  const offset  = circ * (1 - pct)
+
+  async function handleCancel(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!confirm('Cancel your Sprint? Progress is saved but streak resets.')) return
+    setCancelling(true)
+    await cancelSprint(userId).catch(() => {})
+    setSprint(null)
+    setCancelling(false)
+  }
+
+  return (
+    <div
+      className="relative group"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <button
+        onClick={() => router.push('/dashboard/sprint')}
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all hover:bg-white/5"
+      >
+        {/* Circular SVG progress */}
+        <div className="relative flex-shrink-0 w-[34px] h-[34px]">
+          <svg width="34" height="34" viewBox="0 0 34 34" className="-rotate-90">
+            <circle cx="17" cy="17" r={radius} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3"/>
+            <circle
+              cx="17" cy="17" r={radius} fill="none"
+              stroke="url(#sprintGrad)" strokeWidth="3"
+              strokeDasharray={circ}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+            />
+            <defs>
+              <linearGradient id="sprintGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f97316"/>
+                <stop offset="100%" stopColor="#ec4899"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-orange-400">
+            {sprint.streak > 0 ? `${sprint.streak}🔥` : `${sprint.current_day}`}
+          </span>
+        </div>
+
+        <div className="flex-grow min-w-0 text-left">
+          <p className="text-xs font-semibold text-white leading-none truncate">Sprint Active</p>
+          <p className="text-[10px] text-slate-500 mt-0.5">
+            Day {sprint.current_day}/30 · {sprint.completion_pct}% done
+          </p>
+        </div>
+      </button>
+
+      {/* Hover tooltip */}
+      <AnimatePresence>
+        {hovered && (
+          <motion.div
+            initial={{ opacity: 0, x: -4, scale: 0.97 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -4, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute left-full ml-2 top-0 z-50 w-52 bg-canvas border border-border rounded-xl shadow-2xl overflow-hidden"
+          >
+            <div className="p-3 border-b border-border bg-gradient-to-r from-orange-500/10 to-pink-500/10">
+              <p className="text-xs font-bold text-white capitalize">{sprint.niche} Sprint</p>
+              <p className="text-[10px] text-slate-400">{sprint.start_date} → {sprint.end_date}</p>
+            </div>
+            <div className="p-3 grid grid-cols-3 gap-2 border-b border-border">
+              {[
+                [`🔥${sprint.streak}`, 'streak'],
+                [sprint.days_completed, 'done'],
+                [sprint.days_remaining, 'left'],
+              ].map(([v, l]) => (
+                <div key={l as string} className="text-center">
+                  <p className="text-sm font-black text-white">{v}</p>
+                  <p className="text-[9px] text-slate-500">{l}</p>
+                </div>
+              ))}
+            </div>
+            <div className="p-2">
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="w-full text-xs py-1.5 px-3 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all font-medium"
+              >
+                {cancelling ? 'Cancelling...' : '✕ Cancel sprint'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 const PLAN_COLORS: Record<string, string> = {
   free:    'text-slate-400 bg-white/5 border-white/10',
@@ -336,9 +448,6 @@ export function Sidebar() {
                 )}
                 <Icon size={15} className="relative z-10 flex-shrink-0" />
                 <span className="relative z-10 font-medium flex-grow">{item.label}</span>
-                {'badge' in item && item.badge && (
-                  <span className="relative z-10 text-xs leading-none">{item.badge}</span>
-                )}
                 {isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent rounded-full" />
                 )}
@@ -359,6 +468,10 @@ export function Sidebar() {
               <span className="font-medium">Upgrade plan</span>
             </button>
           )}
+
+          {/* Sprint status — shows only when enrolled */}
+          {profile?.id && <SprintStatusIndicator userId={profile.id} />}
+
           <Link
             href="/dashboard/settings"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all"

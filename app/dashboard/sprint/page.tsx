@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import {
-  Flame, CheckCircle, Lock, Calendar, Zap, Trophy,
-  ChevronRight, ArrowRight, Bell, BellOff, BarChart3,
-  Target, Sparkles, Play, X, Info, Loader2, Crown,
+  Flame, CheckCircle, Lock, Zap,
+  ChevronRight, ArrowRight, Sparkles, Play, X, Info, Loader2, Crown,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import {
@@ -14,6 +13,7 @@ import {
   type SprintData, type SprintIdea
 } from '@/lib/api'
 import { NICHES, cn, getNicheEmoji, getDifficultyColor, getFormatLabel } from '@/lib/utils'
+import { LottiePlayer } from '@/components/ui/LottiePlayer'
 
 const FORMAT_ICONS: Record<string, string> = { reel: '📱', short: '▶️', long_form: '🎥' }
 
@@ -118,8 +118,8 @@ function DayCard({
 }
 
 // ── Enrollment Modal ────────────────────────────────────────────
-function EnrollModal({ userId, email, name, onEnrolled, onClose }: {
-  userId: string; email: string; name: string
+function EnrollModal({ userId, email, name, plan, onEnrolled, onClose }: {
+  userId: string; email: string; name: string; plan: string
   onEnrolled: () => void; onClose: () => void
 }) {
   const [niche, setNiche]             = useState('lifestyle')
@@ -157,9 +157,17 @@ function EnrollModal({ userId, email, name, onEnrolled, onClose }: {
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all">
             <X size={15} className="text-white" />
           </button>
-          <div className="text-5xl mb-3">🔥</div>
+          <div className="flex justify-center mb-2">
+            <LottiePlayer preset="fire" size={64} />
+          </div>
           <h2 className="text-2xl font-black text-white mb-1">30-Day Creator Sprint</h2>
           <p className="text-sm text-white/80">30 AI-crafted ideas. One per day. Zero excuses.</p>
+          {plan === 'free' && (
+            <div className="mt-3 inline-flex items-center gap-1.5 bg-white/15 rounded-full px-3 py-1">
+              <Lock size={10} className="text-amber-200" />
+              <span className="text-[10px] font-bold text-amber-200">Free: 7 days unlocked · Upgrade for all 30</span>
+            </div>
+          )}
         </div>
 
         {/* Benefits */}
@@ -276,8 +284,8 @@ function DayDrawer({ idea, day, status, sprint, userId, onComplete, onClose }: {
 
           {/* Status banner */}
           {status === 'completed' && (
-            <div className="mb-4 flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3.5">
-              <CheckCircle size={16} className="text-emerald-400" />
+            <div className="mb-4 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3">
+              <LottiePlayer preset="success" size={40} loop={false} />
               <p className="text-sm font-semibold text-emerald-300">Day completed! 🎉</p>
             </div>
           )}
@@ -343,13 +351,13 @@ export default function SprintPage() {
   const router = useRouter()
   const [sprint, setSprint]                   = useState<SprintData | null>(null)
   const [loading, setLoading]                 = useState(true)
+  const [plan, setPlan]                       = useState<string>('free')
   const [userId, setUserId]                   = useState('')
   const [userEmail, setUserEmail]             = useState('')
   const [userName, setUserName]               = useState('')
   const [showEnroll, setShowEnroll]           = useState(false)
   const [selectedDay, setSelectedDay]         = useState<number | null>(null)
   const [cancelLoading, setCancelLoading]     = useState(false)
-  const [view, setView]                       = useState<'calendar' | 'list'>('list')
 
   useEffect(() => {
     loadUser()
@@ -361,9 +369,9 @@ export default function SprintPage() {
     if (!user) { setLoading(false); return }
     setUserId(user.id)
     setUserEmail(user.email ?? '')
-    // Get name from profiles
-    const { data } = await supabase.from('profiles').select('full_name').eq('id', user.id).single()
+    const { data } = await supabase.from('profiles').select('full_name,plan').eq('id', user.id).single()
     setUserName(data?.full_name ?? user.email?.split('@')[0] ?? 'Creator')
+    setPlan(data?.plan ?? 'free')
     fetchSprint(user.id)
   }
 
@@ -397,11 +405,9 @@ export default function SprintPage() {
   // ── Loading ────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-5xl mb-4 animate-bounce">🔥</div>
-          <p className="text-slate-400 text-sm">Loading your Sprint...</p>
-        </div>
+      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center gap-4">
+        <LottiePlayer preset="rocket" size={120} />
+        <p className="text-slate-400 text-sm font-medium">Loading your Sprint...</p>
       </div>
     )
   }
@@ -416,13 +422,21 @@ export default function SprintPage() {
 
             {/* Hero */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
-              <div className="text-7xl mb-6 animate-bounce">🔥</div>
+              <div className="flex justify-center mb-4">
+                <LottiePlayer preset="fire" size={100} />
+              </div>
               <h1 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
                 30-Day <span className="text-gradient">Creator Sprint</span>
               </h1>
               <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
                 Commit to 30 days of consistent content creation. AI generates your full roadmap. You just show up and create.
               </p>
+              {plan === 'free' && (
+                <div className="inline-flex items-center gap-2 mt-4 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5">
+                  <Lock size={12} className="text-amber-400" />
+                  <p className="text-xs font-semibold text-amber-300">Free plan: First 7 days unlocked · Upgrade for all 30</p>
+                </div>
+              )}
             </motion.div>
 
             {/* Stats row */}
@@ -484,7 +498,7 @@ export default function SprintPage() {
         <AnimatePresence>
           {showEnroll && (
             <EnrollModal
-              userId={userId} email={userEmail} name={userName}
+              userId={userId} email={userEmail} name={userName} plan={plan}
               onEnrolled={() => { setShowEnroll(false); fetchSprint(userId) }}
               onClose={() => setShowEnroll(false)}
             />
@@ -584,22 +598,53 @@ export default function SprintPage() {
             </motion.div>
           )}
 
-          {/* 30-day list */}
+          {/* 30-day list with free-plan gate */}
           <div className="space-y-2">
             <p className="section-label px-1 mb-3">All 30 days</p>
             {sprint.ideas.map((idea, i) => {
               const day = i + 1
               const status = getDayStatus(day)
+              const isFreeLocked = plan === 'free' && day > 7
               return (
                 <motion.div key={day}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(i * 0.02, 0.4) }}
                 >
+                  {/* Free plan upgrade wall at day 8 */}
+                  {plan === 'free' && day === 8 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative overflow-hidden bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-pink-500/15 border-2 border-amber-500/40 rounded-3xl p-6 my-6 text-center"
+                    >
+                      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
+                      <div className="relative z-10">
+                        <div className="flex justify-center mb-3">
+                          <LottiePlayer preset="trophy" size={80} />
+                        </div>
+                        <h3 className="text-lg font-black text-white mb-2">You've unlocked 7 days! 🎉</h3>
+                        <p className="text-sm text-slate-400 mb-4 leading-relaxed max-w-xs mx-auto">
+                          Free accounts get 7 days of Creator Sprint. Upgrade to unlock all 30 days and keep your streak alive.
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                          <button
+                            onClick={() => router.push('/dashboard')}
+                            className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-sm px-6 py-3 rounded-xl shadow-lg shadow-amber-500/20"
+                          >
+                            <Crown size={15} /> Upgrade to Creator Plan
+                          </button>
+                        </div>
+                        <p className="text-xs text-slate-600 mt-3">Your 7-day progress is saved. Upgrade anytime to continue.</p>
+                      </div>
+                    </motion.div>
+                  )}
+
                   <DayCard
-                    idea={idea} day={day} status={status}
-                    isToday={day === sprint.current_day}
-                    onClick={() => status !== 'upcoming' ? setSelectedDay(day) : undefined}
+                    idea={idea} day={day}
+                    status={isFreeLocked ? 'upcoming' : status}
+                    isToday={!isFreeLocked && day === sprint.current_day}
+                    onClick={() => (!isFreeLocked && status !== 'upcoming') ? setSelectedDay(day) : undefined}
                   />
                 </motion.div>
               )
