@@ -15,6 +15,7 @@ import { cn, getNicheEmoji } from '@/lib/utils'
 import { OnboardingTour, useTour } from '@/components/ui/OnboardingTour'
 import { HeroCarousel } from '@/components/feed/HeroCarousel'
 import { LottiePlayer } from '@/components/ui/LottiePlayer'
+import { SprintWidget } from '@/components/dashboard/SprintWidget'
 
 const DEFAULT_FILTERS: FilterState = {
   niche: 'all', platform: 'all', format: 'all', difficulty: 'all',
@@ -262,6 +263,11 @@ export default function DashboardPage() {
                 <a href="/auth/onboarding" className="btn-primary text-xs py-2 block text-center">Set goal →</a>
               </motion.div>
             )}
+
+            {/* Sprint Widget */}
+            <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
+              <SprintWidget />
+            </motion.div>
 
             {/* Top pick */}
             {topIdea && (

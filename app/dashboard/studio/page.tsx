@@ -13,6 +13,7 @@ import { generateIdeas, type IdeaVariant, type HookVariant } from '@/lib/api'
 import { NICHES, PLATFORMS, cn, getDifficultyColor, getFormatLabel, getNicheEmoji } from '@/lib/utils'
 import type { Niche, Platform } from '@/types'
 import { LottiePlayer } from '@/components/ui/LottiePlayer'
+import { createClient } from '@/lib/supabase'
 
 const EXAMPLE_PROMPTS = [
   "How I saved money on a low salary",
@@ -181,8 +182,16 @@ export default function StudioPage() {
     setIdeas([])
 
     try {
+      // Resolve userId — if PlanGate hasn't loaded yet, fetch directly
+      let uid = userId
+      if (!uid) {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        uid = user?.id ?? ''
+      }
+
       const result = await generateIdeas({
-        user_id: userId,
+        user_id: uid,
         prompt,
         niche,
         platforms,
@@ -190,6 +199,7 @@ export default function StudioPage() {
       })
       setIdeas(result.ideas)
     } catch (e: any) {
+      console.error('[Studio] generateIdeas error:', e)
       setError(e.message ?? 'Something went wrong. Try again.')
     } finally {
       setLoading(false)

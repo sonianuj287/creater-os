@@ -117,3 +117,79 @@ export async function getCompetitorExamples(query: string, max = 3) {
     results: Array<{ title: string; channel: string; thumbnail: string; url: string; views: number }>
   }>(`/studio/competitors?query=${encodeURIComponent(query)}&max_results=${max}`)
 }
+
+// ── Trending Audio ─────────────────────────────────────────────
+
+export interface TrendingTrack {
+  id: string
+  title: string
+  artist: string
+  genre: string
+  artwork: string
+  preview_url?: string | null
+  apple_url?: string
+  deezer_url?: string
+  source: 'apple_india' | 'deezer_global' | 'itunes_curated'
+  rank: number
+  hot: boolean
+}
+
+export async function getTrendingAudio(limit = 30, refresh = false) {
+  return call<{ tracks: TrendingTrack[]; source: 'cache' | 'live'; count: number }>(
+    `/studio/trending-audio?limit=${limit}&refresh=${refresh}`
+  )
+}
+
+// ── Creator Sprint ─────────────────────────────────────────────
+
+export interface SprintIdea {
+  day: number
+  title: string
+  hook: string
+  format: string
+  difficulty: string
+  angle: string
+}
+
+export interface SprintData {
+  id: string
+  user_id: string
+  niche: string
+  status: 'active' | 'completed' | 'cancelled'
+  start_date: string
+  end_date: string
+  ideas: SprintIdea[]
+  email_notifications: boolean
+  streak: number
+  days_completed: number
+  current_day: number
+  days_remaining: number
+  completion_pct: number
+  completed_days: Record<string, { completed_at: string; project_id?: string }>
+}
+
+export async function enrollSprint(req: {
+  user_id: string; niche: string; email: string; name: string; email_notifications: boolean
+}) {
+  return call<{ sprint_id: string; start_date: string; end_date: string; ideas_count: number; message: string }>(
+    '/sprint/enroll', { method: 'POST', body: JSON.stringify(req) }
+  )
+}
+
+export async function getMySprint(userId: string) {
+  return call<{ sprint: SprintData | null }>(`/sprint/me/${userId}`)
+}
+
+export async function completeSprintDay(req: {
+  user_id: string; sprint_id: string; day_number: number; project_id?: string
+}) {
+  return call<{ status: string; day: number; total_completed: number }>(
+    '/sprint/complete-day', { method: 'POST', body: JSON.stringify(req) }
+  )
+}
+
+export async function cancelSprint(userId: string) {
+  return call<{ status: string }>(`/sprint/cancel/${userId}`, { method: 'DELETE' })
+}
+
+

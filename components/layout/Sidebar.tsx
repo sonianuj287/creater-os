@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Sparkles, Lightbulb, Film, SendHorizonal,
   BarChart3, Settings, LogOut, Zap, FileText,
-  Crown, X, Check, ChevronUp,
+  Crown, X, Check, ChevronUp, Flame,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GiftCardInput } from '@/components/ui/GiftCard'
@@ -16,12 +16,13 @@ import { useState, useEffect } from 'react'
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
 
 const NAV_ITEMS = [
-  { label: 'Feed',      href: '/dashboard',            icon: Sparkles },
-  { label: 'Ideas',     href: '/dashboard/studio',     icon: Lightbulb },
-  { label: 'Guide',     href: '/dashboard/guide',      icon: FileText },
-  { label: 'Editor',    href: '/dashboard/editor',     icon: Film },
-  { label: 'Publish',   href: '/dashboard/publish',    icon: SendHorizonal },
-  { label: 'Analytics', href: '/dashboard/analytics',  icon: BarChart3 },
+  { label: 'Feed',      href: '/dashboard',             icon: Sparkles },
+  { label: 'Ideas',     href: '/dashboard/studio',      icon: Lightbulb },
+  { label: 'Guide',     href: '/dashboard/guide',       icon: FileText },
+  { label: 'Sprint',    href: '/dashboard/sprint',      icon: Flame,  badge: '🔥' },
+  { label: 'Editor',    href: '/dashboard/editor',      icon: Film },
+  { label: 'Publish',   href: '/dashboard/publish',     icon: SendHorizonal },
+  { label: 'Analytics', href: '/dashboard/analytics',   icon: BarChart3 },
 ]
 
 const PLAN_COLORS: Record<string, string> = {
@@ -334,13 +335,17 @@ export function Sidebar() {
                   />
                 )}
                 <Icon size={15} className="relative z-10 flex-shrink-0" />
-                <span className="relative z-10 font-medium">{item.label}</span>
+                <span className="relative z-10 font-medium flex-grow">{item.label}</span>
+                {'badge' in item && item.badge && (
+                  <span className="relative z-10 text-xs leading-none">{item.badge}</span>
+                )}
                 {isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent rounded-full" />
                 )}
               </Link>
             )
           })}
+
         </nav>
 
         {/* Bottom */}
