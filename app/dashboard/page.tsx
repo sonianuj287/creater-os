@@ -49,15 +49,17 @@ export default function DashboardPage() {
     if (data) {
       setProfile(data)
       if (data.monetisation_goal) setMonetGoal(data.monetisation_goal)
-      // Set niche filter if user has a niche set
-      if (data.niche) setFilters(f => ({ ...f, niche: data.niche }))
+      // NOTE: intentionally NOT setting niche filter from profile —
+      // we always start with 'All niches' so the idea stream is never empty
     }
   }
 
-  async function fetchIdeas(niche = 'all') {
+  // Always fetch the full pool with 'all' — filtering is done client-side
+  // so switching niches never requires a new network request
+  async function fetchIdeas() {
     setLoading(true)
     try {
-      const result = await getTrendingIdeas(niche)
+      const result = await getTrendingIdeas('all')
       if (result.ideas?.length) {
         setIdeas(result.ideas as Idea[])
         setSource('live')
@@ -71,7 +73,7 @@ export default function DashboardPage() {
 
   async function handleRefresh() {
     setRefreshing(true)
-    await fetchIdeas(filters.niche)
+    await fetchIdeas()
     setRefreshing(false)
   }
 
@@ -136,8 +138,8 @@ export default function DashboardPage() {
               )}
             </div>
             <h1 className="text-2xl font-bold text-white">
-              {profile?.niche
-                ? <>What's trending in <span className="text-gradient capitalize">{profile.niche} {getNicheEmoji(profile.niche)}</span></>
+              {filters.niche !== 'all'
+                ? <>What's trending in <span className="text-gradient capitalize">{filters.niche} {getNicheEmoji(filters.niche)}</span></>
                 : <>What to create <span className="text-gradient">right now</span></>
               }
             </h1>
@@ -260,7 +262,9 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 auto-rows-max">
-                  {filteredIdeas.slice(Math.min(5, filteredIdeas.length)).map((idea, i) => {
+                  {/* If 'all' niches selected, skip the first 6 (which are in the carousel). 
+                      Otherwise show all filtered ideas. */}
+                  {(filters.niche === 'all' ? filteredIdeas.slice(6) : filteredIdeas).map((idea, i) => {
                     // Bento Asymmetry pattern calculation
                     const mod = i % 5
                     let size: 'standard' | 'wide' | 'tall' | 'featured' = 'standard'
