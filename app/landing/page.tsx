@@ -6,6 +6,11 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { Instagram, Youtube, TrendingUp, Trophy, Sparkles, Twitter, Github, Linkedin } from 'lucide-react'
+import { LottiePlayer } from '@/components/ui/LottiePlayer'
+import { PricingSection } from '@/components/landing/PricingSection'
+import { TestimonialSection } from '@/components/landing/TestimonialSection'
+import { FAQSection } from '@/components/landing/FAQSection'
 
 // ── Data ──────────────────────────────────────────────────────
 
@@ -42,15 +47,13 @@ function AnimatedHeroLogo() {
   const [phase, setPhase] = useState(0)
   
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 1600) // 'elax' flies out
-    const t2 = setTimeout(() => setPhase(2), 2400) // 'create' and 'os' fly in, 'r' lowers
+    const t1 = setTimeout(() => setPhase(1), 1600)
+    const t2 = setTimeout(() => setPhase(2), 2400)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 
   return (
-    <div className="relative flex items-center justify-center font-black text-[clamp(3.5rem,8vw,7rem)] tracking-tight leading-none h-[180px] mt-4 mb-4 pt-6">
-       
-       {/* 'create' */}
+    <div className="relative flex items-center justify-center font-black text-[clamp(3rem,10vw,7rem)] tracking-tight leading-none h-[140px] md:h-[180px] mt-4 mb-4 pt-6">
        <motion.span
          initial={{ opacity: 0, x: -120, filter: 'blur(20px)' }}
          animate={{ 
@@ -58,13 +61,16 @@ function AnimatedHeroLogo() {
            x: phase >= 2 ? 0 : -80, 
            filter: phase >= 2 ? 'blur(0px)' : 'blur(20px)' 
          }}
-         transition={{ type: 'spring', damping: 15, stiffness: 100, mass: 1 }}
+         transition={{ 
+           opacity: { type: 'spring', damping: 15, stiffness: 100 },
+           x: { type: 'spring', damping: 15, stiffness: 100 },
+           filter: { duration: 0.8, ease: "easeOut" } // Avoid spring for blur to prevent negative values
+         }}
          className="absolute right-[50%] mr-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#ff4d4d] to-[#f97316] pb-2"
        >
          create
        </motion.span>
        
-       {/* 'r' / 'relax' pivot */}
        <div className="absolute left-[50%] -translate-x-1/2 flex pb-2">
          <motion.span
            initial={{ y: -50, scale: 1.2 }}
@@ -94,7 +100,6 @@ function AnimatedHeroLogo() {
          </AnimatePresence>
        </div>
 
-       {/* 'os' */}
        <motion.span
          initial={{ opacity: 0, x: 120, filter: 'blur(20px)' }}
          animate={{ 
@@ -102,216 +107,222 @@ function AnimatedHeroLogo() {
            x: phase >= 2 ? 0 : 80, 
            filter: phase >= 2 ? 'blur(0px)' : 'blur(20px)' 
          }}
-         transition={{ type: 'spring', damping: 15, stiffness: 100, mass: 1 }}
+         transition={{ 
+           opacity: { type: 'spring', damping: 15, stiffness: 100 },
+           x: { type: 'spring', damping: 15, stiffness: 100 },
+           filter: { duration: 0.8, ease: "easeOut" } // Avoid spring for blur to prevent negative values
+         }}
          className="absolute left-[50%] ml-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#7c6af5] to-[#06b6d4] pb-2"
        >
          os
        </motion.span>
-       
     </div>
   )
 }
 
-// ── Animated grid background ──────────────────────────────────
+function InteractiveGlow() {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  useEffect(() => {
+    const handleMouse = (e) => setMousePos({ x: e.clientX, y: e.clientY })
+    window.addEventListener('mousemove', handleMouse)
+    return () => window.removeEventListener('mousemove', handleMouse)
+  }, [])
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <motion.div
+        animate={{ x: mousePos.x - 400, y: mousePos.y - 400 }}
+        transition={{ type: 'spring', damping: 50, stiffness: 200, mass: 0.5 }}
+        className="w-[800px] h-[800px] rounded-full opacity-[0.08]"
+        style={{
+          background: 'radial-gradient(circle, #7c6af5 0%, transparent 70%)',
+          filter: 'blur(80px)',
+        }}
+      />
+    </div>
+  )
+}
+
 function GridBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: `linear-gradient(rgba(124,106,245,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(124,106,245,0.06) 1px, transparent 1px)`,
+        backgroundImage: 'linear-gradient(rgba(124,106,245,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(124,106,245,0.06) 1px, transparent 1px)',
         backgroundSize: '80px 80px',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 90% 60% at 50% 0%, transparent 40%, #08080f 100%)' }} />
-      {[ { x: '20%', y: '20%', c: '#7c6af5' }, { x: '80%', y: '10%', c: '#ec4899' }, { x: '50%', y: '50%', c: '#06b6d4' } ].map((orb, i) => (
-        <motion.div key={i}
-          style={{ position: 'absolute', left: orb.x, top: orb.y, width: 600, height: 600, background: `radial-gradient(circle, ${orb.c}15 0%, transparent 70%)`, filter: 'blur(50px)', transform: 'translate(-50%,-50%)' }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
-          transition={{ duration: 8 + i * 2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      ))}
     </div>
   )
 }
 
-
-// ── 3D Interactive Scroll Showcase (ManyChat Inspired) ────────
 function ScrollShowcase() {
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] })
   
-  // Big floating text scale and fade
-  const textScale = useTransform(scrollYProgress, [0, 0.15], [1, 7])
-  const textOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0])
+  const textScale = useTransform(scrollYProgress, [0, 0.12], [1, 8])
+  const textOpacity = useTransform(scrollYProgress, [0, 0.08, 0.12], [1, 1, 0])
 
-  // Card 1: [0.1 - 0.45]
-  const card1Y = useTransform(scrollYProgress, [0.1, 0.2, 0.35, 0.45], ["50vh", "0vh", "0vh", "-50vh"])
-  const card1Opacity = useTransform(scrollYProgress, [0.1, 0.15, 0.35, 0.45], [0, 1, 1, 0])
-  const card1Scale = useTransform(scrollYProgress, [0.1, 0.2, 0.35, 0.45], [0.85, 1, 1, 1.15])
+  const card1Y = useTransform(scrollYProgress, [0.08, 0.15, 0.35, 0.42], ["30vh", "0vh", "0vh", "-40vh"])
+  const card1Opacity = useTransform(scrollYProgress, [0.08, 0.12, 0.35, 0.42], [0, 1, 1, 0])
+  const card1Scale = useTransform(scrollYProgress, [0.08, 0.15, 0.35, 0.42], [0.9, 1, 1, 1.1])
 
-  // Card 2: [0.4 - 0.75]
-  const card2Y = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], ["50vh", "0vh", "0vh", "-50vh"])
-  const card2Opacity = useTransform(scrollYProgress, [0.4, 0.45, 0.65, 0.75], [0, 1, 1, 0])
-  const card2Scale = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], [0.85, 1, 1, 1.15])
+  const card2Y = useTransform(scrollYProgress, [0.38, 0.45, 0.65, 0.72], ["30vh", "0vh", "0vh", "-40vh"])
+  const card2Opacity = useTransform(scrollYProgress, [0.38, 0.42, 0.65, 0.72], [0, 1, 1, 0])
+  const card2Scale = useTransform(scrollYProgress, [0.38, 0.45, 0.65, 0.72], [0.9, 1, 1, 1.1])
 
-  // Card 3: [0.7 - 1.0]
-  const card3Y = useTransform(scrollYProgress, [0.7, 0.8], ["50vh", "0vh"])
-  const card3Opacity = useTransform(scrollYProgress, [0.7, 0.75], [0, 1])
-  const card3Scale = useTransform(scrollYProgress, [0.7, 0.8], [0.85, 1])
+  const card3Y = useTransform(scrollYProgress, [0.68, 0.75, 0.95, 1.0], ["30vh", "0vh", "0vh", "0vh"])
+  const card3Opacity = useTransform(scrollYProgress, [0.68, 0.72, 0.95], [0, 1, 1])
+  const card3Scale = useTransform(scrollYProgress, [0.68, 0.75], [0.9, 1])
 
-  // Background crossfades
-  const bgOpacity1 = useTransform(scrollYProgress, [0, 0.1, 0.35, 0.45], [0, 1, 1, 0])
-  const bgOpacity2 = useTransform(scrollYProgress, [0.4, 0.5, 0.65, 0.75], [0, 1, 1, 0])
-  const bgOpacity3 = useTransform(scrollYProgress, [0.7, 0.8], [0, 1])
+  const bgOpacity1 = useTransform(scrollYProgress, [0.05, 0.1, 0.35, 0.42], [0, 1, 1, 0])
+  const bgOpacity2 = useTransform(scrollYProgress, [0.38, 0.45, 0.65, 0.72], [0, 1, 1, 0])
+  const bgOpacity3 = useTransform(scrollYProgress, [0.68, 0.75], [0, 1])
 
   return (
-    <div ref={containerRef} className="h-[400vh] relative w-full border-t border-white/5 bg-[#050508]">
+    <div ref={containerRef} className="h-[300vh] md:h-[400vh] relative w-full border-t border-white/5 bg-[#050508]">
       <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-        
-        {/* Massive scrolling text */}
         <motion.div style={{ scale: textScale, opacity: textOpacity }} className="absolute z-10 pointer-events-none flex flex-col items-center justify-center">
-          <h2 className="text-[120px] md:text-[180px] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 text-center mix-blend-overlay">
+          <h2 className="text-[60px] sm:text-[100px] md:text-[150px] lg:text-[180px] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 text-center mix-blend-overlay">
             SCALE<br/>10X
           </h2>
         </motion.div>
-
-        {/* Dynamic Background Halos */}
-        <motion.div style={{ opacity: bgOpacity1 }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(124,106,245,0.15)_0%,_transparent_60%)]" />
-        <motion.div style={{ opacity: bgOpacity2 }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(6,182,212,0.15)_0%,_transparent_60%)]" />
-        <motion.div style={{ opacity: bgOpacity3 }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(236,72,153,0.15)_0%,_transparent_60%)]" />
-
-        {/* Sequence Container */}
+        <motion.div style={{ opacity: bgOpacity1 }} className="absolute inset-0 bg-radial-gradient-1" />
+        <motion.div style={{ opacity: bgOpacity2 }} className="absolute inset-0 bg-radial-gradient-2" />
+        <motion.div style={{ opacity: bgOpacity3 }} className="absolute inset-0 bg-radial-gradient-3" />
         <div className="relative w-[90%] max-w-5xl aspect-video mx-auto flex items-center justify-center perspective-[1200px]">
-            
-            {/* Scene 1: Dashboard UI */}
-            <motion.div style={{ y: card1Y, opacity: card1Opacity, scale: card1Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden glass-panel border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)]">
-               <div className="p-3 md:p-4 bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-md">
+            <motion.div style={{ y: card1Y, opacity: card1Opacity, scale: card1Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0d0d15] border border-white/10 shadow-2xl">
+               <div className="p-3 md:p-4 bg-white/5 border-b border-white/10 flex justify-between items-center">
                  <span className="text-[10px] md:text-xs font-bold tracking-widest text-[#7c6af5] uppercase">Viral Analytics</span>
                  <div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-rose-500"/><div className="w-2.5 h-2.5 rounded-full bg-amber-500"/><div className="w-2.5 h-2.5 rounded-full bg-emerald-500"/></div>
                </div>
                <img src="/assets/hero_dashboard_3d_1774778004295.png" alt="Analytics View" className="w-full object-cover scale-[1.02]" />
-               
-               {/* Floating Tag */}
-               <motion.div className="absolute -left-2 md:-left-6 top-16 md:top-20 bg-black/80 backdrop-blur-xl border border-[#7c6af5]/40 text-white px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3">
-                 <span className="text-lg md:text-xl">📈</span> <span className="text-xs md:text-sm font-bold">Track Viral Scores</span>
-               </motion.div>
             </motion.div>
-
-            {/* Scene 2: Timeline Editor UI */}
-            <motion.div style={{ y: card2Y, opacity: card2Opacity, scale: card2Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden glass-panel border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)]">
-               <div className="p-3 md:p-4 bg-white/5 border-b border-white/10 flex justify-between items-center backdrop-blur-md">
+            <motion.div style={{ y: card2Y, opacity: card2Opacity, scale: card2Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0d0d15] border border-white/10 shadow-2xl">
+               <div className="p-3 md:p-4 bg-white/5 border-b border-white/10 flex justify-between items-center">
                  <span className="text-[10px] md:text-xs font-bold tracking-widest text-[#06b6d4] uppercase">Timeline Engine</span>
                </div>
                <img src="/assets/timeline_editor_3d_1774778024239.png" alt="Timeline Editor" className="w-full object-cover scale-[1.01]" />
-               
-               {/* Floating Tag */}
-               <motion.div className="absolute -right-2 md:-right-6 top-24 md:top-32 bg-black/80 backdrop-blur-xl border border-[#06b6d4]/40 text-white px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3">
-                 <span className="text-lg md:text-xl">✂️</span> <span className="text-xs md:text-sm font-bold">AI Auto Assembly</span>
-               </motion.div>
             </motion.div>
-
-            {/* Scene 3: Publishing Calendar UI */}
-            <motion.div style={{ y: card3Y, opacity: card3Opacity, scale: card3Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden glass-panel border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.9)]">
-               <div className="p-3 md:p-4 bg-black/40 border-b border-white/5 flex justify-between items-center backdrop-blur-md">
+            <motion.div style={{ y: card3Y, opacity: card3Opacity, scale: card3Scale }} className="absolute w-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0d0d15] border border-white/10 shadow-2xl">
+               <div className="p-3 md:p-4 bg-black/40 border-b border-white/5 flex justify-between items-center">
                  <span className="text-[10px] md:text-xs font-bold tracking-widest text-[#ec4899] uppercase">Publishing Queue</span>
                </div>
                <img src="/assets/publishing_calendar_mockup_1774778045010.png" alt="Publish UI" className="w-full object-cover" />
-               
-               {/* Floating Tag */}
-               <motion.div className="absolute -left-2 md:-left-6 bottom-16 md:bottom-20 bg-black/80 backdrop-blur-xl border border-[#ec4899]/40 text-white px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3">
-                 <span className="text-lg md:text-xl">🚀</span> <span className="text-xs md:text-sm font-bold">Post Everywhere</span>
-               </motion.div>
             </motion.div>
-
         </div>
       </div>
     </div>
   )
 }
 
-// ── Main landing page ─────────────────────────────────────────
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
     createClient().auth.getSession().then(({ data }) => {
       if (data.session) setIsLoggedIn(true)
     })
   }, [])
 
   const ctaHref  = isLoggedIn ? '/dashboard' : '/auth/login'
-  const ctaLabel = isLoggedIn ? 'Go to dashboard →' : 'Get started free'
+  const ctaLabel = isLoggedIn ? 'Dashboard' : 'Get started free'
+
+  if (!isClient) return null
 
   return (
-    <div style={{ minHeight: '100vh', background: '#08080f', color: '#fff', overflowX: 'hidden', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-
-      {/* ── Nav ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 bg-[#08080f]/80 backdrop-blur-xl border-b border-white/5">
+    <div className="min-h-screen bg-[#08080f] text-white overflow-x-hidden font-sans">
+      <InteractiveGlow />
+      <nav className="fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-4xl z-[60] flex items-center justify-between px-6 py-4 bg-[#08080f]/60 backdrop-blur-2xl border border-white/10 rounded-2xl md:rounded-3xl shadow-2xl">
         <CreaterosLogoNav />
         <div className="flex items-center gap-4 md:gap-8">
-          <Link href={ctaHref} className="text-sm font-bold px-5 py-2.5 rounded-xl text-white bg-gradient-to-br from-[#7c6af5] to-[#ec4899] shadow-[0_0_20px_rgba(124,106,245,0.3)] hover:scale-105 transition-transform">
+          <Link href={ctaHref} className="hidden sm:block text-sm font-bold text-white/50 hover:text-white transition-colors">
+            Sign in
+          </Link>
+          <Link href={ctaHref} className="text-sm font-bold px-6 py-2.5 rounded-xl text-white bg-gradient-to-br from-[#7c6af5] to-[#ec4899] shadow-lg hover:scale-105 transition-transform">
             {isLoggedIn ? 'Dashboard' : 'Get started'}
           </Link>
         </div>
       </nav>
 
-      {/* ── Hero ── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 overflow-hidden">
         <GridBackground />
+        <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+           <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 6, repeat: Infinity }} className="absolute left-[15%] top-[25%] p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md opacity-40">
+             <Instagram className="text-[#ec4899]" size={28} />
+           </motion.div>
+           <motion.div animate={{ y: [0, 20, 0] }} transition={{ duration: 7, repeat: Infinity }} className="absolute right-[20%] top-[30%] p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md opacity-30">
+             <Youtube className="text-[#ff0000]" size={32} />
+           </motion.div>
+        </div>
 
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-6 mt-12">
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#7c6af5]/10 border border-[#7c6af5]/30 text-xs font-semibold text-[#a89ef8] mb-8"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#7c6af5] animate-pulse" />
-            Built for creators · Post in 3 minutes
+        <div className="relative z-20 text-center max-w-4xl mx-auto px-6 mt-12">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#7c6af5]/10 border border-[#7c6af5]/30 text-xs font-bold text-[#a89ef8] mb-8">
+            <Sparkles size={12} className="animate-pulse" />
+            Empowering the next 1M creators
           </motion.div>
-
           <AnimatedHeroLogo />
-
-          <motion.h4
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-lg md:text-xl text-white/50 leading-relaxed max-w-2xl mx-auto mb-10"
-          >
-            Createros finds what's trending, edits your video automatically, and seamlessly publishes to Instagram and YouTube. Just upload and watch it grow.
+          <motion.h4 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="text-lg md:text-xl text-white/50 font-medium leading-relaxed max-w-2xl mx-auto mb-10">
+            Createros scans trending signals, scripts your content, and automates posting. Turn your ideas into viral reality with the creator's ultimate OS.
           </motion.h4>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
-            <Link href={ctaHref} className="group flex items-center gap-2.5 px-8 py-4 bg-gradient-to-br from-[#7c6af5] to-[#ec4899] text-white font-extrabold text-lg rounded-2xl shadow-[0_0_40px_rgba(124,106,245,0.3),_0_8px_32px_rgba(0,0,0,0.3)] hover:scale-[1.03] transition-all">
-              {ctaLabel} <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </Link>
-            <p className="text-sm text-white/40 font-medium sm:ml-4">Scroll to explore software ↓</p>
-          </motion.div>
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#7c6af5] to-[#ec4899] rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000" />
+              <Link href={ctaHref} className="relative flex items-center gap-3 px-10 py-4 bg-[#08080f] border border-white/10 text-white font-black text-lg rounded-2xl hover:bg-white/[0.02] transition-all">
+                {ctaLabel} <LottiePlayer preset="rocket" size={24} />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── 3D Scroll Immersive Sequence ── */}
       <ScrollShowcase />
 
-      {/* ── Stats bar ── */}
-      <section className="border-t border-b border-white/5 py-12 px-6 bg-white/[0.01]">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <section className="border-t border-b border-white/5 py-16 px-6 bg-white/[0.01]">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
           {[
-            { v: '10×',   l: 'More content generated' },
-            { v: '3 min', l: 'To process a full video' },
-            { v: '5+',    l: 'Platforms connected' },
-            { v: '0',     l: 'Editing skills needed' },
+            { v: '10x', l: 'Output Boost' },
+            { v: '3 m', l: 'Fast workflow' },
+            { v: '2,400', l: 'Active Creators' },
+            { v: '0', l: 'Skills Required' },
           ].map((s, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-              <p className="text-4xl md:text-5xl font-black mb-2 tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-[#ff4d4d] via-[#7c6af5] to-[#06b6d4]">
-                {s.v}
-              </p>
-              <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">{s.l}</p>
-            </motion.div>
+            <div key={i}>
+              <p className="text-4xl md:text-5xl font-black mb-1.5 tracking-tight">{s.v}</p>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">{s.l}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* ── How it works Grid ── */}
+      <section className="py-32 px-6 relative overflow-hidden">
+         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-[#ff4d4d]/10 blur-[100px] pointer-events-none rounded-full" />
+         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="">
+               <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 rounded-xl bg-[#ff4d4d]/10 flex items-center justify-center border border-[#ff4d4d]/20">
+                   <LottiePlayer preset="fire" size={24} />
+                 </div>
+                 <span className="text-xs font-black uppercase tracking-widest text-[#ff4d4d]">30-Day Growth Challenge</span>
+               </div>
+               <h2 className="text-4xl md:text-6xl font-black leading-tight mb-8">
+                 The 30-Day <br/>
+                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff4d4d] to-[#f97316]">Creator Sprint</span>
+               </h2>
+               <p className="text-lg text-white/50 mb-10 leading-relaxed max-w-xl">
+                 Don't just create content. Build a habit. Our Sprint engine gives you a roadmap, tracks your streak, and uses AI to refine your niche day by day.
+               </p>
+            </div>
+            <div className="relative">
+               <div className="absolute -inset-4 bg-gradient-to-br from-[#ff4d4d]/20 to-transparent blur-2xl rounded-[3rem]" />
+               <div className="relative bg-[#0d0d15] border border-white/10 rounded-[2.5rem] p-1 overflow-hidden shadow-2xl">
+                  <img src="/assets/media__1774782265115.png" alt="Sprint Dashboard" className="rounded-[2.4rem] w-full" />
+               </div>
+            </div>
+         </div>
+      </section>
+
       <section className="py-24 px-6 md:px-10">
         <div className="max-w-5xl mx-auto text-center mb-16">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-[#7c6af5] mb-4">How it works</p>
@@ -319,29 +330,64 @@ export default function LandingPage() {
         </div>
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {STEPS.map((step, i) => (
-             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-               className="relative overflow-hidden p-6 rounded-3xl border border-white/10 glass-panel" style={{ background: step.bg }}>
+             <div key={i} className="relative overflow-hidden p-6 rounded-3xl border border-white/10" style={{ background: step.bg }}>
                <div className="absolute right-4 top-4 text-6xl font-black opacity-[0.05]" style={{ color: step.color }}>{step.num}</div>
                <h3 className="text-sm font-black mb-4 uppercase tracking-widest" style={{ color: step.color }}>{step.sub}</h3>
                <p className="text-2xl font-bold text-white mb-3">{step.title}</p>
                <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
-             </motion.div>
+             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/5 py-8 px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 bg-[#08080f]">
-        <CreaterosLogoNav />
-        <p className="text-xs font-medium text-white/30 text-center md:text-left">Built for creators. Post more. Stress less.</p>
-        <div className="flex gap-6 items-center">
-          <Link href={ctaHref} className="text-xs font-bold text-white/40 hover:text-white transition-colors">{isLoggedIn ? 'Dashboard' : 'Get started'}</Link>
+      <TestimonialSection />
+      <PricingSection />
+      <FAQSection />
+
+      <footer className="border-t border-white/5 py-12 px-6 md:px-20 bg-[#050508] relative z-10 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+           <div className="col-span-1 md:col-span-2">
+             <CreaterosLogoNav />
+             <p className="mt-6 text-white/40 max-w-sm leading-relaxed">
+               The ultimate AI OS for content creators. From trending ideas to automated posting, we help you scale your presence effortlessly.
+             </p>
+             <div className="flex gap-4 mt-8">
+               {[Instagram, Youtube, Twitter, Github].map((Icon, i) => (
+                 <Link key={i} href="#" className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all">
+                   <Icon size={18} />
+                 </Link>
+               ))}
+             </div>
+           </div>
+           <div>
+             <h4 className="font-bold mb-6">Product</h4>
+             <ul className="space-y-4 text-sm text-white/40">
+               <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
+               <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+               <li><Link href="#testimonials" className="hover:text-white transition-colors">Testimonials</Link></li>
+             </ul>
+           </div>
+           <div>
+             <h4 className="font-bold mb-6">Legal</h4>
+             <ul className="space-y-4 text-sm text-white/40">
+               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+               <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+             </ul>
+           </div>
+        </div>
+        <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-[10px] uppercase tracking-widest text-white/20 font-black">© 2026 Createros AI. All rights reserved.</p>
+          <div className="flex gap-8">
+             <p className="text-[10px] uppercase tracking-widest text-white/20 font-black">Made with ⚡ in India</p>
+          </div>
         </div>
       </footer>
 
-      <style>{`
-        .glass-panel { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); }
-        .transform-style-3d { transform-style: preserve-3d; }
+      <style jsx global>{`
+        .bg-radial-gradient-1 { background: radial-gradient(circle at 50% 50%, rgba(124,106,245,0.15) 0%, transparent 60%); }
+        .bg-radial-gradient-2 { background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.11) 0%, transparent 60%); }
+        .bg-radial-gradient-3 { background: radial-gradient(circle at 50% 50%, rgba(236,72,153,0.11) 0%, transparent 60%); }
       `}</style>
     </div>
   )
