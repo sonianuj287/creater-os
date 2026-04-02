@@ -99,6 +99,14 @@ export default function DashboardPage() {
     }
   }
 
+  // Carousel: always shows ALL ideas sorted by viral score — never goes blank when a niche has no ideas
+  const carouselIdeas = useMemo(() => {
+    return [...ideas]
+      .sort((a, b) => (b.viral_score ?? 0) - (a.viral_score ?? 0))
+      .slice(0, 6)
+  }, [ideas])
+
+  // Filtered stream: respects every active filter for the idea list below the carousel
   const filteredIdeas = useMemo(() => {
     return ideas.filter((idea) => {
       if (filters.niche !== 'all' && idea.niche !== filters.niche) return false
@@ -148,12 +156,16 @@ export default function DashboardPage() {
           </motion.button>
         </div>
 
-        {/* 3D HERO CAROUSEL */}
-        {!loading && filteredIdeas.length > 0 && (
+        {/* 3D HERO CAROUSEL — always shows top ideas across ALL niches */}
+        {!loading && carouselIdeas.length > 0 && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
-            <HeroCarousel ideas={filteredIdeas.slice(0, Math.min(5, filteredIdeas.length))} />
+            <HeroCarousel ideas={carouselIdeas} />
+            <p className="text-center text-[11px] text-slate-600 -mt-4 mb-2 tracking-wide">
+              ✦ Showing top trending ideas across <span className="text-slate-500 font-semibold">all niches</span> — use the filters below to see your niche
+            </p>
           </motion.div>
         )}
+
 
         {/* Main Feed + Sidebar Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 lg:mt-8">
@@ -217,12 +229,28 @@ export default function DashboardPage() {
                 <span className="text-sm text-slate-500 font-medium">Fetching trending ideas...</span>
               </div>
             ) : filteredIdeas.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-slate-500 text-sm">No ideas match your filters.</p>
-                <button onClick={() => { setFilters(DEFAULT_FILTERS); setSearch('') }} className="text-accent text-sm mt-2 hover:underline">
-                  Clear filters
+              <div className="text-center py-16">
+                <p className="text-3xl mb-3">
+                  {filters.niche !== 'all' ? getNicheEmoji(filters.niche) : '🔍'}
+                </p>
+                <p className="text-white font-semibold text-sm mb-1">
+                  {filters.niche !== 'all'
+                    ? `No ideas yet for "${filters.niche}"`
+                    : 'No ideas match your filters'}
+                </p>
+                <p className="text-slate-500 text-xs mb-5 max-w-xs mx-auto leading-relaxed">
+                  {filters.niche !== 'all'
+                    ? 'The carousel above still shows ideas from all niches. Clear the filter to browse everything.'
+                    : 'Try adjusting your search or removing a filter.'}
+                </p>
+                <button
+                  onClick={() => { setFilters(DEFAULT_FILTERS); setSearch('') }}
+                  className="text-accent text-sm font-medium hover:underline"
+                >
+                  Clear all filters →
                 </button>
               </div>
+
             ) : (
               <div className="mt-8">
                 <div className="flex items-center gap-4 mb-6">
