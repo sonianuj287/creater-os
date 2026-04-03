@@ -13,8 +13,8 @@ const PLANS = [
     bg: 'rgba(255,255,255,0.03)',
   },
   {
-    name: 'Pro',
-    price: '2,499',
+    name: 'Creator',
+    price: '100',
     unit: '/mo',
     desc: 'For serious creators going viral.',
     features: ['20 AI Ideas / day', 'Premium Scripting + Shot List', '4K Exports', 'AI Auto-Edit + Captions', 'Priority Support'],
@@ -23,8 +23,8 @@ const PLANS = [
     popular: true,
   },
   {
-    name: 'Agency',
-    price: '8,999',
+    name: 'Pro',
+    price: '350',
     unit: '/mo',
     desc: 'For teams managing multiple brands.',
     features: ['Unlimited AI Ideas', 'Advanced Multi-brand Dashboard', 'White-label Reports', 'Dedicated Manager', 'API Access'],
@@ -38,7 +38,7 @@ export function PricingSection() {
     <section className="py-32 px-6 relative overflow-hidden" id="pricing">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -46,7 +46,7 @@ export function PricingSection() {
           >
             Pricing
           </motion.p>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -77,7 +77,7 @@ export function PricingSection() {
                   Most Popular
                 </div>
               )}
-              
+
               <div className="mb-8">
                 <h3 className="text-xl font-black mb-2" style={{ color: plan.color }}>{plan.name}</h3>
                 <p className="text-sm text-white/40">{plan.desc}</p>
@@ -99,12 +99,11 @@ export function PricingSection() {
                 ))}
               </div>
 
-              <button 
-                className={`w-full py-4 rounded-2xl font-black transition-all ${
-                  plan.popular 
-                    ? 'bg-gradient-to-br from-[#7c6af5] to-[#ec4899] text-white shadow-xl hover:scale-[1.02]' 
+              <button
+                className={`w-full py-4 rounded-2xl font-black transition-all ${plan.popular
+                    ? 'bg-gradient-to-br from-[#7c6af5] to-[#ec4899] text-white shadow-xl hover:scale-[1.02]'
                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
-                }`}
+                  }`}
               >
                 Get Started
               </button>
