@@ -1,7 +1,7 @@
 'use client'
 
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Sparkles, ArrowRight, Lightbulb, Zap,
@@ -14,6 +14,8 @@ import { NICHES, PLATFORMS, cn, getDifficultyColor, getFormatLabel, getNicheEmoj
 import type { Niche, Platform } from '@/types'
 import { LottiePlayer } from '@/components/ui/LottiePlayer'
 import { createClient } from '@/lib/supabase'
+
+import { useStudioStore } from '@/lib/store'
 
 const EXAMPLE_PROMPTS = [
   "How I saved money on a low salary",
@@ -162,16 +164,25 @@ function IdeaResultCard({ idea, index, niche }: { idea: IdeaVariant; index: numb
 export default function StudioPage() {
   const router = useRouter()
   const { usage, canGenerate, userId } = usePlanGate()
-  const [prompt, setPrompt] = useState('')
-  const [niche, setNiche] = useState<Niche>('finance')
-  const [platforms, setPlatforms] = useState<Platform[]>(['instagram', 'youtube'])
+  
+  // Persisted store
+  const { 
+    prompt, niche, platforms, ideas, 
+    setPrompt, setNiche, setPlatforms, setIdeas 
+  } = useStudioStore()
+
   const [loading, setLoading] = useState(false)
-  const [ideas, setIdeas] = useState<IdeaVariant[]>([])
   const [error, setError] = useState('')
+  const [hasHydrated, setHasHydrated] = useState(false)
+
+  // Rehydration check
+  useEffect(() => {
+    setHasHydrated(true)
+  }, [])
 
   function togglePlatform(p: Platform) {
-    setPlatforms(prev =>
-      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
+    setPlatforms(
+      platforms.includes(p) ? platforms.filter(x => x !== p) : [...platforms, p]
     )
   }
 
@@ -182,7 +193,6 @@ export default function StudioPage() {
     setIdeas([])
 
     try {
-      // Resolve userId — if PlanGate hasn't loaded yet, fetch directly
       let uid = userId
       if (!uid) {
         const supabase = createClient()
@@ -205,6 +215,8 @@ export default function StudioPage() {
       setLoading(false)
     }
   }
+
+  if (!hasHydrated) return null // Wait for client-side hydration to avoid flicker/mismatch
 
   return (
     <div className="min-h-screen bg-canvas">

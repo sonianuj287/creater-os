@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { Instagram, Youtube, TrendingUp, Trophy, Sparkles, Twitter, Github, Linkedin } from 'lucide-react'
+import { Instagram, Youtube, TrendingUp, Trophy, Sparkles, Twitter, Github, Linkedin, ArrowRight } from 'lucide-react'
 import { LottiePlayer } from '@/components/ui/LottiePlayer'
 import { PricingSection } from '@/components/landing/PricingSection'
 import { TestimonialSection } from '@/components/landing/TestimonialSection'
@@ -216,6 +216,53 @@ function ScrollShowcase() {
   )
 }
 
+function FeatureShowcase() {
+  const features = [
+    { title: 'Viral Feed', desc: 'AI-curated ideas tailored to your niche and audience. Never wonder what to post again.', img: '/assets/dashboard_feed.png', color: '#7c6af5' },
+    { title: 'Idea Studio', desc: 'Generate viral hooks and scripts in seconds with AI. Turn raw thoughts into structured content.', img: '/assets/dashboard_studio.png', color: '#ec4899' },
+    { title: 'Smart Publishing', desc: 'Automate your content pipeline across all platforms. One click to go everywhere.', img: '/assets/dashboard_publish.png', color: '#06b6d4' },
+  ]
+
+  return (
+    <section className="py-32 px-6 bg-[#050508] relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#7c6af5]/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="max-w-7xl mx-auto space-y-40 relative z-10">
+        {features.map((f, i) => (
+          <motion.div 
+            key={i}
+            initial={{ opacity: 0, y: 60 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className={`flex flex-col ${i % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-24`}
+          >
+            <div className="flex-1 space-y-8">
+              <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: f.color }} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Feature Show</span>
+              </div>
+              <h3 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">{f.title}</h3>
+              <p className="text-xl text-white/50 leading-relaxed max-w-lg font-medium">{f.desc}</p>
+              <div className="pt-4">
+                <Link href="/auth/login" className="text-sm font-bold flex items-center gap-2 text-white/80 hover:text-white transition-colors group">
+                  EXPLORE {f.title} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+            <div className="flex-[1.5] relative group">
+              <div className="absolute -inset-4 bg-gradient-to-br from-white/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition duration-700 rounded-[3rem]" />
+              <div className="relative bg-[#0d0d15] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-transform duration-700 group-hover:scale-[1.02] group-hover:-rotate-1">
+                <img src={f.img} alt={f.title} className="w-full" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#08080f]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isClient, setIsClient] = useState(false)
@@ -279,6 +326,7 @@ export default function LandingPage() {
       </section>
 
       <ScrollShowcase />
+      <FeatureShowcase />
 
       <section className="border-t border-b border-white/5 py-16 px-6 bg-white/[0.01]">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
@@ -317,7 +365,7 @@ export default function LandingPage() {
             <div className="relative">
                <div className="absolute -inset-4 bg-gradient-to-br from-[#ff4d4d]/20 to-transparent blur-2xl rounded-[3rem]" />
                <div className="relative bg-[#0d0d15] border border-white/10 rounded-[2.5rem] p-1 overflow-hidden shadow-2xl">
-                  <img src="/assets/media__1774782265115.png" alt="Sprint Dashboard" className="rounded-[2.4rem] w-full" />
+                  <img src="/assets/dashboard_sprint.png" alt="Sprint Dashboard" className="rounded-[2.4rem] w-full" />
                </div>
             </div>
          </div>
