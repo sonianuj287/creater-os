@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowLeft, Check, Zap } from 'lucide-react'
 import { createClient, updateProfile } from '@/lib/supabase'
+import { getMySprint, cancelSprint } from '@/lib/api'
 import { NICHES, PLATFORMS, cn } from '@/lib/utils'
+import { SprintWarningModal } from '@/components/onboarding/SprintWarningModal'
 import type { Niche, Platform, MonetisationGoal } from '@/types'
 
 const MONETISATION_TARGETS: Array<{ platform: Platform; target: number; label: string }> = [
@@ -21,6 +23,12 @@ export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>('niche')
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  // Sprint warning state
+  const [initialNiches, setInitialNiches] = useState<string[]>([])
+  const [activeSprint, setActiveSprint] = useState<any>(null)
+  const [showWarning, setShowWarning] = useState(false)
 
   // Form state
   const [niches, setNiches] = useState<string[]>([])
@@ -28,6 +36,50 @@ export default function OnboardingPage() {
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [monetisationTarget, setMonetisationTarget] = useState<Platform>('instagram')
   const [currentFollowers, setCurrentFollowers] = useState('')
+
+  useEffect(() => {
+    loadCurrentProfile()
+  }, [])
+
+  async function loadCurrentProfile() {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
+    // Load profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (profile) {
+      const savedNiches = profile.niche ? profile.niche.split(',') : []
+      setNiches(savedNiches)
+      setInitialNiches(savedNiches)
+      setSubNiche(profile.sub_niche || '')
+      setPlatforms(profile.platforms || [])
+      if (profile.monetisation_goal) {
+        setMonetisationTarget(profile.monetisation_goal.platform)
+        setCurrentFollowers(String(profile.monetisation_goal.current_followers || ''))
+      }
+    }
+
+    // Load sprint status
+    try {
+      const res = await getMySprint(user.id)
+      if (res.sprint && res.sprint.status === 'active') {
+        setActiveSprint(res.sprint)
+      }
+    } catch (e) {
+      console.error('Failed to load sprint status', e)
+    }
+
+    setLoading(false)
+  }
 
   const stepIndex = STEPS.indexOf(step)
   const progress = ((stepIndex + 1) / STEPS.length) * 100
@@ -45,10 +97,31 @@ export default function OnboardingPage() {
   }
 
   async function handleFinish() {
+    // Check if niche changed while sprint is active
+    const nicheChanged = JSON.stringify(niches.sort()) !== JSON.stringify(initialNiches.sort())
+    
+    if (nicheChanged && activeSprint) {
+      setShowWarning(true)
+      return
+    }
+
+    await confirmFinish()
+  }
+
+  async function confirmFinish() {
     setSaving(true)
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth/login'); return }
+
+    // If niche changed, cancel current sprint
+    if (activeSprint) {
+      try {
+        await cancelSprint(user.id)
+      } catch (e) {
+        console.error('Failed to cancel sprint', e)
+      }
+    }
 
     const target = MONETISATION_TARGETS.find((t) => t.platform === monetisationTarget)
     const goal: MonetisationGoal = {
@@ -89,8 +162,24 @@ export default function OnboardingPage() {
     exit: { opacity: 0, x: -24 },
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+      <SprintWarningModal 
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        onConfirm={() => {
+          setShowWarning(false)
+          confirmFinish()
+        }}
+      />
       <div className="fixed inset-0 bg-grid-pattern bg-grid opacity-100 pointer-events-none" />
       <div className="fixed top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent/8 rounded-full blur-[80px] pointer-events-none" />
 
