@@ -30,7 +30,13 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white mb-4">3. Privacy Policy</h2>
+            <h2 className="text-xl font-bold text-white mb-4">3. Third-Party Services</h2>
+            <p className="mb-4">CreaterOS integrates with third-party platforms like YouTube. By using our YouTube publishing features, you agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">YouTube Terms of Service</a>.</p>
+            <p>We use the YouTube Data API to facilitate uploads and analytics. Your use of these features is also subject to Google's Privacy Policy at <a href="http://www.google.com/policies/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">http://www.google.com/policies/privacy</a>.</p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-white mb-4">4. Privacy Policy</h2>
             <p>Your use of the service is also governed by our Privacy Policy, which is incorporated into these terms by reference.</p>
           </section>
 
