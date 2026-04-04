@@ -118,11 +118,10 @@ function DayCard({
 }
 
 // ── Enrollment Modal ────────────────────────────────────────────
-function EnrollModal({ userId, email, name, plan, onEnrolled, onClose }: {
-  userId: string; email: string; name: string; plan: string
+function EnrollModal({ userId, email, name, plan, niche, onEnrolled, onClose }: {
+  userId: string; email: string; name: string; plan: string; niche: string
   onEnrolled: () => void; onClose: () => void
 }) {
-  const [niche, setNiche]             = useState('lifestyle')
   const [emailNotif, setEmailNotif]   = useState(true)
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState('')
@@ -188,20 +187,10 @@ function EnrollModal({ userId, email, name, plan, onEnrolled, onClose }: {
 
         {/* Config */}
         <div className="p-6 space-y-4">
-          <div>
-            <label className="section-label mb-2 block">Choose your niche</label>
-            <div className="grid grid-cols-3 gap-2">
-              {NICHES.map(n => (
-                <button key={n.value} onClick={() => setNiche(n.value)}
-                  className={cn(
-                    'px-3 py-2 rounded-xl border text-xs font-semibold transition-all capitalize flex items-center gap-1.5 justify-center',
-                    niche === n.value ? 'bg-accent/20 border-accent/60 text-white' : 'border-border text-slate-400 hover:border-border-2'
-                  )}
-                >
-                  {n.emoji} {n.label}
-                </button>
-              ))}
-            </div>
+          <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Target Niche</p>
+            <p className="text-sm font-semibold text-white capitalize">{getNicheEmoji(niche)} {niche}</p>
+            <p className="text-[10px] text-slate-500 mt-1 italic">To change this, visit your account settings.</p>
           </div>
 
           <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-border hover:border-border-2 transition-colors">
@@ -355,6 +344,7 @@ export default function SprintPage() {
   const [userId, setUserId]                   = useState('')
   const [userEmail, setUserEmail]             = useState('')
   const [userName, setUserName]               = useState('')
+  const [userNiche, setUserNiche]             = useState('lifestyle')
   const [showEnroll, setShowEnroll]           = useState(false)
   const [selectedDay, setSelectedDay]         = useState<number | null>(null)
   const [cancelLoading, setCancelLoading]     = useState(false)
@@ -369,9 +359,10 @@ export default function SprintPage() {
     if (!user) { setLoading(false); return }
     setUserId(user.id)
     setUserEmail(user.email ?? '')
-    const { data } = await supabase.from('profiles').select('full_name,plan').eq('id', user.id).single()
+    const { data } = await supabase.from('profiles').select('full_name,plan,niche').eq('id', user.id).single()
     setUserName(data?.full_name ?? user.email?.split('@')[0] ?? 'Creator')
     setPlan(data?.plan ?? 'free')
+    setUserNiche(data?.niche?.split(',')[0] ?? 'lifestyle')
     fetchSprint(user.id)
   }
 
@@ -498,7 +489,7 @@ export default function SprintPage() {
         <AnimatePresence>
           {showEnroll && (
             <EnrollModal
-              userId={userId} email={userEmail} name={userName} plan={plan}
+              userId={userId} email={userEmail} name={userName} plan={plan} niche={userNiche}
               onEnrolled={() => { setShowEnroll(false); fetchSprint(userId) }}
               onClose={() => setShowEnroll(false)}
             />
