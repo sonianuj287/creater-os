@@ -299,7 +299,7 @@ export default function SettingsPage() {
             <Layers size={14} className="text-accent" />
             <p className="text-sm font-semibold text-white">Connected accounts</p>
           </div>
-          <p className="text-xs text-slate-500 mb-5 leading-relaxed">Connect your YouTube and Instagram accounts to post directly from the dashboard and pull analytics.</p>
+          <p className="text-xs text-slate-500 mb-5 leading-relaxed">Connect your YouTube accounts to post directly from the dashboard and pull analytics.</p>
           <PlatformConnections />
         </motion.div>
 

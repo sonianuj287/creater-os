@@ -5,15 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   SendHorizonal, Film, Download, Layers, FileText, Scissors,
   Image, Twitter, Mail, Loader2, AlertCircle,
-  Calendar, CheckCircle, Clock, ArrowRight, Sparkles,
-  Instagram, Youtube, Share2,
+  Calendar, CheckCircle, Clock, ArrowRight, Sparkles, Youtube, Share2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { CaptionGenerator } from '@/components/publish/CaptionGenerator'
 import { Scheduler } from '@/components/publish/Scheduler'
 import { PlanGate, usePlanGate } from '@/components/ui/PlanGate'
 
-import { PostToInstagram } from '@/components/publish/PostToInstagram'
 import { cn, formatNumber } from '@/lib/utils'
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
@@ -22,13 +20,12 @@ type Tab = 'preview' | 'captions' | 'publish'
 
 const FORMAT_LABELS: Record<string, { label: string; desc: string }> = {
   '9x16': { label: '9:16 Vertical', desc: 'Reels · Shorts · TikTok' },
-  '1x1':  { label: '1:1 Square',    desc: 'Instagram feed' },
+  '1x1':  { label: '1:1 Square',    desc: 'Community Post' },
   '16x9': { label: '16:9 Wide',     desc: 'YouTube' },
 }
 
 function PlatformBadge({ platform }: { platform: string }) {
   const colors: Record<string, string> = {
-    instagram: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
     youtube:   'bg-red-500/20 text-red-300 border-red-500/30',
     twitter:   'bg-sky-500/20 text-sky-300 border-sky-500/30',
   }
@@ -256,23 +253,6 @@ export default function PublishPage() {
 
                     {/* Instant Post Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Instagram */}
-                      <div className="bg-surface border border-border rounded-2xl p-5">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-8 h-8 bg-pink-500/20 rounded-lg flex items-center justify-center text-xs font-bold text-pink-300 border border-pink-500/30">IG</div>
-                          <div>
-                            <p className="text-sm font-semibold text-white">Instagram Reel</p>
-                            <p className="text-xs text-slate-500">Post now directly</p>
-                          </div>
-                        </div>
-                        <PostToInstagram
-                          projectId={selected.id}
-                          outputId={output.id}
-                          videoUrl={output.format_urls?.['9x16'] ?? ''}
-                          caption={caption}
-                        />
-                      </div>
-
                       {/* YouTube */}
                       <div className="bg-surface border border-border rounded-2xl p-5">
                         <div className="flex items-center gap-2 mb-4">
@@ -304,7 +284,7 @@ export default function PublishPage() {
                         <Scheduler
                           projectId={selected.id}
                           outputId={output.id}
-                          platform="instagram"
+                          platform="youtube"
                           caption={caption}
                           hashtags=""
                         />

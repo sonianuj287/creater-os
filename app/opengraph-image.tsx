@@ -55,7 +55,7 @@ export default function OGImage() {
 
           {/* Subline */}
           <p style={{ fontSize:22, color:'rgba(255,255,255,0.5)', maxWidth:700, lineHeight:1.5, margin:0 }}>
-            AI ideas · auto video editing · captions · Instagram + YouTube
+            AI ideas · auto video editing · captions · YouTube
           </p>
 
           {/* Pills */}

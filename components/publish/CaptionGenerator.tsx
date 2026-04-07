@@ -7,7 +7,6 @@ import { generateCaptions } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const PLATFORMS = [
-  { id: 'instagram', label: 'Instagram' },
   { id: 'youtube',   label: 'YouTube' },
   { id: 'twitter',   label: 'Twitter / X' },
   { id: 'linkedin',  label: 'LinkedIn' },
@@ -29,7 +28,7 @@ interface CaptionGeneratorProps {
 }
 
 export function CaptionGenerator({ title, description, niche, hook, onApply }: CaptionGeneratorProps) {
-  const [platform, setPlatform]   = useState('instagram')
+  const [platform, setPlatform]   = useState('youtube')
   const [loading, setLoading]     = useState(false)
   const [result, setResult]       = useState<any>(null)
   const [selected, setSelected]   = useState(0)

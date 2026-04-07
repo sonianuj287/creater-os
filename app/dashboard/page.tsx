@@ -90,7 +90,7 @@ export default function DashboardPage() {
         user_id: profile.id,
         prompt,
         niche: profile.niche ?? 'lifestyle',
-        platforms: profile.platforms ?? ['instagram'],
+        platforms: profile.platforms ?? ['youtube'],
         num_ideas: 1,
       })
       if (result.ideas?.[0]) setCombinedIdea(result.ideas[0])

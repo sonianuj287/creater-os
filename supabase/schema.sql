@@ -17,10 +17,10 @@ create table public.profiles (
   -- Niche & platform prefs (set during onboarding)
   niche text,                        -- 'finance' | 'fitness' | 'tech' | 'lifestyle' | 'food' | 'travel' | 'education' | 'other'
   sub_niche text,                    -- More specific e.g. 'crypto' under 'finance'
-  platforms text[] default '{}',    -- ['instagram','youtube','tiktok','twitter','linkedin']
+  platforms text[] default '{}',    -- ['youtube','tiktok','twitter','linkedin']
   content_formats text[] default '{}', -- ['reels','shorts','carousels','long_form','threads']
   -- Monetisation goals
-  monetisation_goal jsonb default '{}', -- { platform: 'instagram', target_followers: 10000, current_followers: 3400 }
+  monetisation_goal jsonb default '{}', -- { platform:  target_followers: 10000, current_followers: 3400 }
   -- Plan
   plan text default 'free',          -- 'free' | 'creator' | 'pro' | 'agency'
   stripe_customer_id text,
@@ -165,7 +165,7 @@ create table public.analytics_snapshots (
 create table public.connected_accounts (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references public.profiles(id) on delete cascade not null,
-  platform text not null,            -- 'instagram' | 'youtube' | 'tiktok' | 'twitter' | 'linkedin'
+  platform text not null,            -- 'youtube' | 'tiktok' | 'twitter' | 'linkedin'
   platform_user_id text,
   platform_username text,
   platform_display_name text,
@@ -253,9 +253,9 @@ create trigger set_projects_updated_at before update on public.projects
 -- SEED: Sample trending ideas
 -- ============================================================
 insert into public.ideas (title, description, hook_preview, niche, platforms, recommended_format, difficulty, estimated_minutes, viral_score, trending_reason, similar_views_avg) values
-('How I saved ₹50,000 in 6 months on a ₹30k salary', 'Personal finance breakdown showing exact budget splits, zero-based budgeting, and small wins that compound.', '"Everyone says save money. Nobody shows you HOW on a low salary. Here''s my exact breakdown..."', 'finance', ARRAY['instagram','youtube'], 'reel', 'easy', 30, 91, '4.2M views on similar content this week', 890000),
-('5 AI tools replacing my ₹20k/month freelancer job', 'Practical demo of 5 tools that automate design, writing, video editing, and customer support tasks.', '"I paid someone ₹20,000 a month for this. Now I use these 5 free tools instead..."', 'tech', ARRAY['youtube','instagram'], 'short', 'medium', 45, 87, 'AI tools niche up 340% search volume this month', 650000),
-('What no one tells you about starting a YouTube channel', 'The real numbers: views, revenue, time invested vs returns. Myth-busting format.', '"I made ₹0 for 8 months. Here''s what actually changes everything in month 9..."', 'education', ARRAY['youtube','instagram'], 'long_form', 'medium', 90, 84, 'Creator economy content surging after YT monetisation update', 1200000),
-('Morning routine that changed my productivity completely', 'A realistic 45-min morning routine with science behind each habit. No 4am wakeups.', '"I''m not a morning person. This routine works even if you sleep until 8..."', 'lifestyle', ARRAY['instagram','tiktok'], 'reel', 'easy', 25, 79, 'Productivity niche consistently top-5 saves category', 420000),
-('Gym workout for people who hate the gym', 'Minimal equipment, 30-min sessions, real body transformation. Anti-gym-bro energy.', '"Been going to the gym for 2 years with zero results. Then I changed one thing..."', 'fitness', ARRAY['instagram','youtube','tiktok'], 'reel', 'easy', 35, 88, '2.1M saves on similar anti-bro fitness content this month', 750000),
-('How to cook restaurant-quality biryani at home', 'Step-by-step with common mistakes shown and fixed. Satisfying B-roll of final dish.', '"Every biryani recipe lies to you about one step. Here''s what they skip..."', 'food', ARRAY['instagram','youtube'], 'reel', 'medium', 40, 82, 'Food content highest save rate of any niche on Instagram', 980000);
+('How I saved ₹50,000 in 6 months on a ₹30k salary', 'Personal finance breakdown showing exact budget splits, zero-based budgeting, and small wins that compound.', '"Everyone says save money. Nobody shows you HOW on a low salary. Here''s my exact breakdown..."', 'finance', ARRAY['youtube'], 'reel', 'easy', 30, 91, '4.2M views on similar content this week', 890000),
+('5 AI tools replacing my ₹20k/month freelancer job', 'Practical demo of 5 tools that automate design, writing, video editing, and customer support tasks.', '"I paid someone ₹20,000 a month for this. Now I use these 5 free tools instead..."', 'tech', ARRAY['youtube'], 'short', 'medium', 45, 87, 'AI tools niche up 340% search volume this month', 650000),
+('What no one tells you about starting a YouTube channel', 'The real numbers: views, revenue, time invested vs returns. Myth-busting format.', '"I made ₹0 for 8 months. Here''s what actually changes everything in month 9..."', 'education', ARRAY['youtube'], 'long_form', 'medium', 90, 84, 'Creator economy content surging after YT monetisation update', 1200000),
+('Morning routine that changed my productivity completely', 'A realistic 45-min morning routine with science behind each habit. No 4am wakeups.', '"I''m not a morning person. This routine works even if you sleep until 8..."', 'lifestyle', ARRAY['tiktok'], 'reel', 'easy', 25, 79, 'Productivity niche consistently top-5 saves category', 420000),
+('Gym workout for people who hate the gym', 'Minimal equipment, 30-min sessions, real body transformation. Anti-gym-bro energy.', '"Been going to the gym for 2 years with zero results. Then I changed one thing..."', 'fitness', ARRAY['youtube','tiktok'], 'reel', 'easy', 35, 88, '2.1M saves on similar anti-bro fitness content this month', 750000),
+('How to cook restaurant-quality biryani at home', 'Step-by-step with common mistakes shown and fixed. Satisfying B-roll of final dish.', '"Every biryani recipe lies to you about one step. Here''s what they skip..."', 'food', ARRAY['youtube'], 'reel', 'medium', 40, 82, 'Food content highest save rate of any niche on Instagram', 980000);

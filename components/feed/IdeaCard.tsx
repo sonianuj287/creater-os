@@ -21,7 +21,6 @@ interface IdeaCardProps {
 }
 
 const PLATFORM_ICONS: Record<string, string> = {
-  instagram: 'IG',
   youtube: 'YT',
   tiktok: 'TK',
   twitter: 'X',

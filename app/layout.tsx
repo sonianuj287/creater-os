@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default: 'Createros — From idea to posted in 3 minutes',
     template: '%s | Createros',
   },
-  description: 'AI-powered content OS for Indian creators. Get trending ideas, auto-edit your videos, generate captions, and post to Instagram + YouTube — all in one place.',
+  description: 'AI-powered content OS for Indian creators. Get trending ideas, auto-edit your videos, generate captions, and post to YouTube — all in one place.',
   keywords: [
     'content creator tools india',
     'ai video editing india',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     url:         BASE_URL,
     siteName:    'Createros',
     title:       'Createros — From idea to posted in 3 minutes',
-    description: 'AI-powered content OS for Indian creators. Trending ideas → auto-edit → post to Instagram + YouTube.',
+    description: 'AI-powered content OS for Indian creators. Trending ideas → auto-edit → post to YouTube.',
     images: [{
       url:    '/og-image.png',
       width:  1200,

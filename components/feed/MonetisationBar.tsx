@@ -7,7 +7,6 @@ import { getMonetisationProgress, getMonetisationETA, formatNumber } from '@/lib
 import { cn } from '@/lib/utils'
 
 const PLATFORM_THRESHOLDS: Record<string, { followers: number; label: string }> = {
-  instagram: { followers: 10000, label: 'IG Bonuses + Subscriptions' },
   youtube: { followers: 1000, label: 'YouTube Partner Program' },
   tiktok: { followers: 10000, label: 'TikTok Creator Fund' },
   twitter: { followers: 500, label: 'X Monetisation' },

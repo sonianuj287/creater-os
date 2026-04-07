@@ -10,7 +10,6 @@ import { useSearchParams } from 'next/navigation'
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
 
 const PLATFORMS = [
-  { id: 'instagram', label: 'Instagram', desc: 'Reels, carousels, feed posts', comingSoon: false },
   { id: 'youtube',   label: 'YouTube',   desc: 'Shorts and long-form videos',  comingSoon: false },
   { id: 'twitter',   label: 'Twitter / X', desc: 'Tweets and video posts',     comingSoon: true  },
   { id: 'tiktok',    label: 'TikTok',    desc: 'Short video posts',             comingSoon: true  },
@@ -18,7 +17,6 @@ const PLATFORMS = [
 ]
 
 const COLORS: Record<string, string> = {
-  instagram: 'bg-pink-500/15 border-pink-500/30 text-pink-300',
   youtube:   'bg-red-500/15 border-red-500/30 text-red-300',
   twitter:   'bg-sky-500/15 border-sky-500/30 text-sky-300',
   tiktok:    'bg-slate-500/15 border-slate-500/30 text-slate-300',
@@ -26,7 +24,6 @@ const COLORS: Record<string, string> = {
 }
 
 const ACTIVE_COLORS: Record<string, string> = {
-  instagram: 'bg-pink-500/20 border-pink-500/50',
   youtube:   'bg-red-500/20 border-red-500/50',
   twitter:   'bg-sky-500/20 border-sky-500/50',
   tiktok:    'bg-slate-500/20 border-slate-500/50',

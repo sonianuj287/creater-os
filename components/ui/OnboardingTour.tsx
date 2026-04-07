@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase'
 const TOUR_STEPS = [
   {
     title: 'Welcome to Creator OS! 👋',
-    desc: "You're looking at your trending ideas feed. Every day, AI scans YouTube and Instagram to find what's viral in your niche — so you never run out of content ideas.",
+    desc: "You're looking at your trending ideas feed. Every day, AI scans YouTube to find what's viral in your niche — so you never run out of content ideas.",
     target: 'feed',
     emoji: '🔥',
   },
@@ -38,7 +38,7 @@ const TOUR_STEPS = [
   },
   {
     title: 'Publish everywhere in one click',
-    desc: "Go to Publish to post your video to Instagram and YouTube. Generate AI captions and hashtags for each platform, schedule for peak times, and track your results in Analytics.",
+    desc: "Go to Publish to post your video to YouTube. Generate AI captions and hashtags, schedule for peak times, and track your results in Analytics.",
     target: 'publish',
     emoji: '🚀',
   },

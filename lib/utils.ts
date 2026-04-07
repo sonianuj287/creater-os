@@ -31,7 +31,7 @@ export function getDifficultyColor(d: Difficulty): string {
 
 export function getPlatformColor(p: Platform): string {
   return {
-    instagram: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+    
     youtube: 'bg-red-500/20 text-red-300 border-red-500/30',
     tiktok: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
     twitter: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
@@ -78,7 +78,7 @@ export const NICHES: Array<{ value: Niche; label: string; emoji: string }> = [
 ]
 
 export const PLATFORMS: Array<{ value: Platform; label: string }> = [
-  { value: 'instagram', label: 'Instagram' },
+  
   { value: 'youtube', label: 'YouTube' },
   { value: 'tiktok', label: 'TikTok' },
   { value: 'twitter', label: 'Twitter / X' },
@@ -86,9 +86,9 @@ export const PLATFORMS: Array<{ value: Platform; label: string }> = [
 ]
 
 export const FORMATS: Array<{ value: ContentFormat; label: string; platform: string }> = [
-  { value: 'reel', label: 'Reel', platform: 'Instagram' },
+  { value: 'reel', label: 'Reel/Short', platform: 'YouTube' },
   { value: 'short', label: 'YT Short', platform: 'YouTube' },
-  { value: 'carousel', label: 'Carousel', platform: 'Instagram' },
+  { value: 'carousel', label: 'Community Post', platform: 'YouTube' },
   { value: 'long_form', label: 'Long-form', platform: 'YouTube' },
   { value: 'thread', label: 'Thread', platform: 'Twitter' },
 ]

@@ -15,7 +15,7 @@ import type { MonetisationGoal } from '@/types'
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
 
 const PLATFORM_COLORS: Record<string, string> = {
-  instagram: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+  
   youtube:   'bg-red-500/20 text-red-300 border-red-500/30',
   tiktok:    'bg-slate-500/20 text-slate-300 border-slate-500/30',
   twitter:   'bg-sky-500/20 text-sky-300 border-sky-500/30',
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
                 Analytics are pulled 48 hours after you post. Start by posting content from the Publish page.
               </p>
               {connected.length === 0 && (
-                <p className="text-xs text-amber-400 mb-4">Connect your Instagram or YouTube account first.</p>
+                <p className="text-xs text-amber-400 mb-4">Connect your YouTube account first.</p>
               )}
               <div className="flex gap-3 justify-center">
                 <a href="/dashboard/publish" className="btn-primary text-xs py-2 px-4">Go to Publish</a>

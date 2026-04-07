@@ -11,7 +11,6 @@ import { SprintWarningModal } from '@/components/onboarding/SprintWarningModal'
 import type { Niche, Platform, MonetisationGoal } from '@/types'
 
 const MONETISATION_TARGETS: Array<{ platform: Platform; target: number; label: string }> = [
-  { platform: 'instagram', target: 10000, label: 'Instagram Bonuses (10K followers)' },
   { platform: 'youtube', target: 1000, label: 'YouTube Partner (1K subs + 4K hrs)' },
   { platform: 'tiktok', target: 10000, label: 'TikTok Creator Fund (10K followers)' },
 ]
@@ -34,7 +33,7 @@ export default function OnboardingPage() {
   const [niches, setNiches] = useState<string[]>([])
   const [subNiche, setSubNiche] = useState('')
   const [platforms, setPlatforms] = useState<Platform[]>([])
-  const [monetisationTarget, setMonetisationTarget] = useState<Platform>('instagram')
+  const [monetisationTarget, setMonetisationTarget] = useState<Platform>('youtube')
   const [currentFollowers, setCurrentFollowers] = useState('')
 
   useEffect(() => {

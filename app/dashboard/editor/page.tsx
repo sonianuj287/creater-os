@@ -41,7 +41,7 @@ interface JobResult {
 
 const FORMAT_LABELS: Record<string, { label: string; desc: string; icon: string }> = {
   '9x16': { label: '9:16 Vertical', desc: 'Reels · Shorts · TikTok', icon: '📱' },
-  '1x1':  { label: '1:1 Square',    desc: 'Instagram feed',           icon: '⬜' },
+  '1x1':  { label: '1:1 Square',    desc: 'Community Post',           icon: '⬜' },
   '16x9': { label: '16:9 Wide',     desc: 'YouTube',                  icon: '🖥️' },
 }
 

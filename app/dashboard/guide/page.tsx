@@ -131,7 +131,7 @@ function GuidePage() {
   const [description, setDescription] = useState('')
   const [hook, setHook]             = useState('')
   const [niche, setNiche]           = useState<Niche>('finance')
-  const [platform, setPlatform]     = useState<Platform>('instagram')
+  const [platform, setPlatform]     = useState<Platform>('youtube')
   const [format, setFormat]         = useState<ContentFormat>('reel')
   const [duration, setDuration]     = useState(3)
 

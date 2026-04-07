@@ -15,10 +15,10 @@ import { FAQSection } from '@/components/landing/FAQSection'
 // ── Data ──────────────────────────────────────────────────────
 
 const STEPS = [
-  { num: '01', title: 'Discover', sub: 'Trending ideas daily', desc: 'AI scans YouTube and Instagram every morning. You wake up to 20 viral-ready ideas in your niche.', color: '#7c6af5', bg: 'rgba(124,106,245,0.08)' },
+  { num: '01', title: 'Discover', sub: 'Trending ideas daily', desc: 'AI scans YouTube every morning. You wake up to 20 viral-ready ideas in your niche.', color: '#7c6af5', bg: 'rgba(124,106,245,0.08)' },
   { num: '02', title: 'Plan',     sub: 'Script + shot list',   desc: 'One click generates a full script, shot list, and free B-roll links. Know exactly what to say.', color: '#ec4899', bg: 'rgba(236,72,153,0.08)' },
   { num: '03', title: 'Film',     sub: 'Scene by scene',       desc: 'Upload each scene separately. The AI assembles them, cuts silences, burns captions, and exports.', color: '#06b6d4', bg: 'rgba(6,182,212,0.08)' },
-  { num: '04', title: 'Publish',  sub: 'Post everywhere',      desc: 'AI captions, hashtags, scheduled at peak times. One click posts to Instagram and YouTube.', color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+  { num: '04', title: 'Publish',  sub: 'Post everywhere',      desc: 'AI captions, hashtags, scheduled at peak times. One click posts to YouTube.', color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
 ]
 
 // ── Logo Component (NavBar) ───────────────────────────────────

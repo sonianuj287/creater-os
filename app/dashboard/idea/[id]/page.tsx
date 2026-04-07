@@ -15,7 +15,7 @@ import {
 } from '@/lib/utils'
 
 const PLATFORM_NAMES: Record<string, string> = {
-  instagram: 'Instagram', youtube: 'YouTube',
+  youtube: 'YouTube',
   tiktok: 'TikTok', twitter: 'Twitter / X', linkedin: 'LinkedIn'
 }
 
@@ -138,7 +138,7 @@ export default function IdeaDetailPage() {
                 {[
                   { step: 1, label: 'Generate a script', desc: 'Get a full script outline with shot list', href: `/dashboard/guide?title=${encodeURIComponent(idea.title)}&niche=${idea.niche}`, icon: FileText },
                   { step: 2, label: 'Record and edit', desc: 'Upload your footage to auto-edit and caption', href: '/dashboard/editor', icon: Film },
-                  { step: 3, label: 'Publish it', desc: 'Generate captions and post to Instagram/YouTube', href: '/dashboard/publish', icon: Lightbulb },
+                  { step: 3, label: 'Publish it', desc: 'Generate captions and post to YouTube', href: '/dashboard/publish', icon: Lightbulb },
                 ].map(item => (
                   <a
                     key={item.step}

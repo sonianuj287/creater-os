@@ -4,7 +4,7 @@
 
 export type Plan = 'free' | 'creator' | 'pro' | 'agency'
 export type Niche = 'finance' | 'fitness' | 'tech' | 'lifestyle' | 'food' | 'travel' | 'education' | 'gaming' | 'beauty' | 'other' | string
-export type Platform = 'instagram' | 'youtube' | 'tiktok' | 'twitter' | 'linkedin'
+export type Platform = 'youtube' | 'tiktok' | 'twitter' | 'linkedin'
 export type ContentFormat = 'reel' | 'short' | 'carousel' | 'long_form' | 'thread'
 export type Difficulty = 'easy' | 'medium' | 'hard'
 export type ProjectStatus = 'planning' | 'scripting' | 'recording' | 'editing' | 'publishing' | 'published'

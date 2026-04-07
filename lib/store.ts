@@ -34,13 +34,13 @@ export const useStudioStore = create<StudioState>()(
     (set) => ({
       prompt: '',
       niche: 'finance',
-      platforms: ['instagram', 'youtube'],
+      platforms: ['youtube'],
       ideas: [],
       setPrompt: (prompt) => set({ prompt }),
       setNiche: (niche) => set({ niche }),
       setPlatforms: (platforms) => set({ platforms }),
       setIdeas: (ideas) => set({ ideas }),
-      reset: () => set({ prompt: '', niche: 'finance', platforms: ['instagram', 'youtube'], ideas: [] }),
+      reset: () => set({ prompt: '', niche: 'finance', platforms: ['youtube'], ideas: [] }),
     }),
     {
       name: 'studio-storage',
