@@ -30,8 +30,13 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white mb-4">3. Data Security</h2>
-            <p>We take reasonable measures to protect your information from unauthorized access, use, or disclosure.</p>
+            <h2 className="text-xl font-bold text-white mb-4">3. Data Protection Mechanisms & Security</h2>
+            <p className="mb-4">We implement industry-standard security measures to protect your sensitive data from unauthorized access, alteration, disclosure, or destruction. Our data protection mechanisms include:</p>
+            <ul className="list-disc ml-6 mb-4 space-y-2">
+              <li><strong>Encryption in Transit:</strong> All data transmitted between your browser, our servers, and third-party APIs (like Google) is encrypted using secure TLS/HTTPS protocols.</li>
+              <li><strong>Encryption at Rest:</strong> Sensitive data, including Google/YouTube OAuth access and refresh tokens, is securely encrypted at rest within our database infrastructure.</li>
+              <li><strong>Access Controls:</strong> Strict role-based access controls and authentication layers are enforced. Only your authenticated session can initiate actions that utilize your tokens.</li>
+            </ul>
           </section>
 
           <section>
@@ -41,7 +46,7 @@ export default function PrivacyPage() {
               <li><code className="text-accent">youtube.upload</code>: Used solely to allow you to post generated videos (Shorts or long-form) directly from our dashboard to your YouTube channel.</li>
               <li><code className="text-accent">youtube.readonly</code>: Used to retrieve your channel information (name, subscriber count) and video analytics to display performance metrics in our dashboard.</li>
             </ul>
-            <p className="mb-4">We do not store your Google/YouTube password. Access is granted via secure OAuth tokens. We do not sell or share your YouTube channel data with any third parties.</p>
+            <p className="mb-4">We do not store your Google/YouTube password. Access is granted via secure OAuth tokens, which are protected by the encryption mechanisms detailed above. We do not sell or share your YouTube channel data with any third parties.</p>
             <p>You can revoke access at any time via the "Disconnect" button in your dashboard or through your Google Account Security settings.</p>
           </section>
 
